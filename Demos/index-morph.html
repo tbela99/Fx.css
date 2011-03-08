@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>Fx.CSS Morph</title>
+<style type="text/css">
+html {
+
+	font-family:Arial, Helvetica, sans-serif;
+	color: #333;
+	font-size:1.2em;
+}
+body {
+
+	font-size: 75%;
+	line-height:19px;
+}
+.square, .circle {
+
+	height: 100px;
+	width:100px;
+	margin: 0 auto;
+	cursor: pointer;
+	border: 1px solid #000;
+	vertical-align: middle;
+	text-align: center;
+	font-size: 150%;
+}
+
+.circle {
+
+	-moz-border-radius: 50%;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+}
+</style>
+<script type="text/javascript" src="../mootools.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.js"></script>
+<script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.Morph.js"></script>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	window.addEvent('domready', function () {
+
+		var value,
+			events = [{transform: ['rotate(0deg) scale(1, 0) skew(0, 3deg) translate(100px, 50px)', 'rotate(180deg) scale(1.5, 4) skew(0, 3deg) translate(20px, 3px)']},
+					{transform: 'rotate(90deg) scale(1, 1) skew(0,0) translate(0, 0)'},
+					{transform: 'rotate(-90deg)'},
+					{transform: 'rotate(0)'},
+					{color: '#fff', backgroundColor: '#000', borderColor: '#245884'},
+					{height: 250, width: 300, transform: 'rotate(157deg)'},
+					{height: 100, width: 100, transform: 'rotate(0)'},
+					{height: 300, width: 250, transform: 'rotate(20deg)'},
+					{color: '#000', backgroundColor: '#fff', borderColor: '#000'}
+				];
+				
+			document.getElements('.square, .circle').each(function (el) {
+			
+				el.set('morph', {duration: 1000, link: 'chain'}).addEvent('click', function () {
+
+					this.get('morph').cancel()
+					.start(events[6])
+					.start(events[0])
+					.start(events[1])
+					.start(events[4])
+					.start(events[5])
+					.start(events[3])
+					.start(events[7])
+					.start(events[6])
+					.start(events[8]);
+				})
+			})
+	})
+//]]></script>
+</head><body>
+    <div class="square">morph</div>
+    <div class="circle">tween</div>
+</body></html>
