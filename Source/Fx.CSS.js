@@ -1,6 +1,6 @@
 /*
 ---
-description: native css animations with morph and tween, support of the css3 transform rule.
+description: native css animations.
 
 license: MIT-style
 
@@ -9,15 +9,15 @@ authors:
 
 credits:
 - amadeus (CSSEvents)
-- André Fiedler, eskimoblood (Fx.Tween.CSS3)
+- AndrÃ© Fiedler, eskimoblood (Fx.Tween.CSS3)
 
 requires:
 core/1.3:
 - Array
-- Element/Element.Style
-- Fx/Fx.CSS
+- Element.Style
+- Fx.CSS
 
-provides: [Fx.CSS.Parsers.Transform]
+provides: [FxCSS]
 
 ...
 */
@@ -28,7 +28,7 @@ provides: [Fx.CSS.Parsers.Transform]
 		get = Element.prototype.getStyle,
 		vendor = '',
 		div = new Element('div'),
-	prefix = (Browser.safari || Browser.chrome || Browser.Platform.ios) ? 'webkit' :
+		prefix = (Browser.safari || Browser.chrome || Browser.Platform.ios) ? 'webkit' :
 			(Browser.opera) ? 'o' :
 			(Browser.ie) ? 'ms' : '';
 
@@ -37,7 +37,6 @@ provides: [Fx.CSS.Parsers.Transform]
 
 		case 'safari':
 		case 'chrome':
-		case 'safari':
 			vendor = '-webkit-';
 			break;
 		case 'firefox':
@@ -121,7 +120,7 @@ provides: [Fx.CSS.Parsers.Transform]
 		'quint:in:out'	: '0.9,0,0.1,1'
 	};
 	
-	var FxCSS = this.FxCSS = {
+	this.FxCSS = {
 
 		Binds: ['onComplete'],
 		initialize: function(element, options){

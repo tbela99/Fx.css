@@ -13,7 +13,7 @@ credits:
 requires:
 core/1.3:
 - Array
-- Fx/Fx.CSS
+- Fx.CSS
 
 provides: [Fx.CSS.Parsers.Transform]
 

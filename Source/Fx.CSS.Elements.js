@@ -1,6 +1,6 @@
 /*
 ---
-description: native css animations with morph and tween, support of the css3 transform rule.
+description: native css animations with Fx.Elements.
 
 license: MIT-style
 
@@ -13,9 +13,9 @@ Fx.CSS:
 - Stylesheet
 core/1.3:
 - Array
-- Class/Class
-- Element/Element.Style
-- Fx/Fx.CSS
+- Element.Style
+more/1.3:
+- Fx.Elements
 
 provides: [Fx.CSS.Parsers.Transform]
 

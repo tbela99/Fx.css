@@ -9,10 +9,12 @@ authors:
 
 
 requires:
+Fx.CSS:
+- Fx.CSS
 core/1.3:
 - Array
-- Element/Element.Style
-- Fx/Fx.CSS
+- Element.Style
+- Fx.Tween
 
 provides: none
 
