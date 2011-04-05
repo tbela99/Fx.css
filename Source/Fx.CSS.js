@@ -24,77 +24,73 @@ provides: [FxCSS]
 
 (function () {
 
+
 	var set = Element.prototype.setStyle,
 		get = Element.prototype.getStyle,
-		vendor = '',
+		//vendor = '',
 		div = new Element('div'),
-		prefix = (Browser.safari || Browser.chrome || Browser.Platform.ios) ? 'webkit' :
-			(Browser.opera) ? 'o' :
-			(Browser.ie) ? 'ms' : '';
-
-	//sounds like this is dirty, real dirty
-	switch(Browser.name) {
-
-		case 'safari':
-		case 'chrome':
-			vendor = '-webkit-';
-			break;
-		case 'firefox':
-			vendor = '-moz-';
-			break;
-		case 'opera':
-			vendor = '-o-';
-			break;
-		case 'ie':
-			vendor = '-ms-';
-			break;
-	}
-
+		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : ''));
+			
+	function getPrefix(prop) {  
+	
+		var prefixes = ['Moz','Webkit','Khtml','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		
+		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return prefixes[i] + upper; 
+				
+		return prop;  
+	}  
+		
 	Element.implement({
 
 		setStyle: function (property, value) {
 
-			switch(property) {
+			//property = getPrefix(property);
+			// switch(property) {
 
-				case 'transform':
-				case 'transition':
-							property = vendor + property;
-							break;
-			}
+				// case 'transform':
+				// case 'transition':
+							// property = vendor + property;
+							// break;
+			// }
 
-			return set.call(this, property, value);
+			if(window.console && console.log) console.log([getPrefix(property), value])
+			return set.call(this, getPrefix(property), value);
 		},
 		getStyle: function (property) {
 
-			switch(property) {
+			// switch(property) {
 
-				case 'transform':
-				case 'transition':
-							property = vendor + property;
-							break;
-			}
+				// case 'transform':
+				// case 'transition':
+							// property = vendor + property;
+							// break;
+			// }
 
-			return get.call(this, property);
+			return get.call(this, getPrefix(property));
 		}
 	});
 
 	//eventTypes
-	['transitionStart', 'transitionEnd', 'animationStart', 'animationIteration', 'animationEnd'].each(function(eventType){
+	['transitionStart', 'transitionEnd'/* , 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType){
 
-			Element.NativeEvents[eventType.toLowerCase()] = 2;
+		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
-			var customType = eventType;
+		var customType = eventType;
+		
+		if (prefix) customType = prefix + customType.capitalize();
+		else customType = customType.toLowerCase();
 
-			if (prefix) customType = prefix + customType.capitalize();
-			else customType = customType.toLowerCase();
-
-			Element.NativeEvents[customType] = 2;
-
-			Element.Events[eventType.toLowerCase()] = {base: customType }
-
+		Element.NativeEvents[customType] = 2;
+		Element.Events[eventType.toLowerCase()] = {base: customType }
+		
 	}, this);
-
-	Fx.css3Transition = !!div.setStyle('transition', 'none').getStyle('transition');
+	
+	//no transition support for IE and FF3 at least for now
+	Fx.css3Transition = !Browser.ie && !(Browser.name == 'firefox' && Browser.version < 4) && !!div.setStyle('transition', 'none').getStyle('transition');
+	
+	if(window.console && console.log) console.log(Fx.css3Transition);
+	
+	
 	Fx.transitionTimings = {
 		'linear'		: '0,0,1,1',
 		'expo:in'		: '0.71,0.01,0.83,0',
@@ -150,6 +146,7 @@ provides: [FxCSS]
 
 		onComplete: function () {
 
+			if(window.console && console.log) console.log(['completed', this.css]);
 			if(this.css && this.running) {
 
 				this.element.removeEvents(this.events).setStyle('transition', 'none');
@@ -172,6 +169,6 @@ provides: [FxCSS]
 
 			return this.parent()
 		}
-	};
+	}
 
 })();
