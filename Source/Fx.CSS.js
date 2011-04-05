@@ -53,7 +53,7 @@ provides: [FxCSS]
 							// break;
 			// }
 
-			if(window.console && console.log) console.log([getPrefix(property), value])
+			//if(window.console && console.log) console.log([getPrefix(property), value])
 			return set.call(this, getPrefix(property), value);
 		},
 		getStyle: function (property) {
@@ -88,7 +88,7 @@ provides: [FxCSS]
 	//no transition support for IE and FF3 at least for now
 	Fx.css3Transition = !Browser.ie && !(Browser.name == 'firefox' && Browser.version < 4) && !!div.setStyle('transition', 'none').getStyle('transition');
 	
-	if(window.console && console.log) console.log(Fx.css3Transition);
+	//if(window.console && console.log) console.log(Fx.css3Transition);
 	
 	
 	Fx.transitionTimings = {
@@ -146,7 +146,7 @@ provides: [FxCSS]
 
 		onComplete: function () {
 
-			if(window.console && console.log) console.log(['completed', this.css]);
+			//if(window.console && console.log) console.log(['completed', this.css]);
 			if(this.css && this.running) {
 
 				this.element.removeEvents(this.events).setStyle('transition', 'none');
