@@ -22,49 +22,32 @@ provides: [FxCSS]
 ...
 */
 
-(function () {
+!function () {
 
 
 	var set = Element.prototype.setStyle,
 		get = Element.prototype.getStyle,
 		//vendor = '',
 		div = new Element('div'),
-		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : ''));
+		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
+		prefixes = ['Khtml','Moz','Webkit','O','ms'];
 			
 	function getPrefix(prop) {  
 	
-		var prefixes = ['Moz','Webkit','Khtml','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
 		
 		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return prefixes[i] + upper; 
 				
 		return prop;  
 	}  
-		
+	
 	Element.implement({
 
 		setStyle: function (property, value) {
 
-			//property = getPrefix(property);
-			// switch(property) {
-
-				// case 'transform':
-				// case 'transition':
-							// property = vendor + property;
-							// break;
-			// }
-
-			//if(window.console && console.log) console.log([getPrefix(property), value])
 			return set.call(this, getPrefix(property), value);
 		},
 		getStyle: function (property) {
-
-			// switch(property) {
-
-				// case 'transform':
-				// case 'transition':
-							// property = vendor + property;
-							// break;
-			// }
 
 			return get.call(this, getPrefix(property));
 		}
@@ -85,11 +68,17 @@ provides: [FxCSS]
 		
 	}, this);
 	
-	//no transition support for IE and FF3 at least for now
-	Fx.css3Transition = !Browser.ie && !(Browser.name == 'firefox' && Browser.version < 4) && !!div.setStyle('transition', 'none').getStyle('transition');
+	//detect if transition property is supported
+	Fx.css3Transition = (function (prop) {
 	
-	//if(window.console && console.log) console.log(Fx.css3Transition);
-	
+		if(prop in div.style) return true;
+		
+		var prefixes = ['Khtml','Moz','Webkit','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		
+		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return true; 
+				
+		return false
+	})('transition');
 	
 	Fx.transitionTimings = {
 		'linear'		: '0,0,1,1',
@@ -171,4 +160,4 @@ provides: [FxCSS]
 		}
 	}
 
-})();
+}();

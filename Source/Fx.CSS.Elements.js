@@ -22,7 +22,7 @@ provides: [Fx.CSS.Parsers.Transform]
 ...
 */
 
-(function () {
+!function () {
 
 	var stylesheet = new Stylesheet(),
 		span = new Element('span');
@@ -43,7 +43,7 @@ provides: [Fx.CSS.Parsers.Transform]
 			this.css = !this.locked && typeof this.options.transition == 'string' && Fx.css3Transition && Fx.transitionTimings[this.options.transition];
 					//	&& !properties.transform;
 
-			var from = {}, to = {}, classNames = {}, styles = {}, css, complete = function () { 
+			var from = {}, to = {}, classNames = {}, styles = {}, css, style, complete = function () { 
 			
 				for(var i in classNames) {
 				
@@ -77,29 +77,27 @@ provides: [Fx.CSS.Parsers.Transform]
 				
 				for(i in from) {
 
-					this.elements[i].setStyle('transition', 'none');
+					this.elements[i].setStyle('transition', 'none').
+									setStyles(Object.map(from[i], function (value, property) {
 
-					Object.each(from[i], function (value, property) {
+										value = Array.flatten(Array.from(value))[0];
 
-						value = Array.flatten(Array.from(value))[0];
+										return value.parser.serve(value.value)
 
-						this.elements[i].setStyle(property, value.parser.serve(value.value))
-
-					}, this);
-
-					this.elements[i].addEvents(this.events).setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')');
+									})).
+									addEvents(this.events).
+									setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')');
 
 					css = '';
-					styles[i] = {}
-					Object.each(to[i], function (value, property) {
+					styles[i] = Object.map(to[i], function (value, property) {
 
 						value = Array.flatten(Array.from(value))[0];
 						
-						styles[i][property] = span.setStyle(property, value.parser.serve(value.value)).getStyle(property);
+						style = span.setStyle(property, value.parser.serve(value.value)).getStyle(property);
+						for(p in styles) css +=  property.hyphenate() + ':' + style + ' !important;';
+						return style;
 						
-						for(p in styles) css +=  property.hyphenate() + ':' + styles[i][property] + ' !important;';
-						
-					}, this);
+					});
 					
 					classNames[i] = 'clsTmp' + String.uniqueID();
 					stylesheet.addRule('.' + classNames[i], css);
@@ -113,7 +111,6 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			return this.parent(from, to);
 		},
-
 
 		onComplete: function () {
 
@@ -133,4 +130,4 @@ provides: [Fx.CSS.Parsers.Transform]
 		}
 	}))
 	
-})();
+}();

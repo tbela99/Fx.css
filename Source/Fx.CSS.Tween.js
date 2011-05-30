@@ -39,7 +39,7 @@ Fx.Tween.implement(Object.merge({
 
 		parsed = this.prepare(this.element, property, args);
 
-		if (this.css) {
+		if(this.css) {
 
 			//console.log(JSON.encode([from, to]));
 			this.running = true;
@@ -51,7 +51,7 @@ Fx.Tween.implement(Object.merge({
 
 			if(args[1]) this.element.setStyle('transition', 'none').setStyle(property, from);
 
-			this.element.addEvents(this.events).setStyle('transition', property + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+			this.element.addEvents(this.events).setStyle('transition', property.hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
 						setStyle(property, to);
 
 			//console.log([to, from, ['', 'transparent', 'auto', 'none'].indexOf(from)])

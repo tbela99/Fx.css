@@ -20,7 +20,7 @@ provides: [Fx.CSS.Parsers.Transform]
 ...
 */
 
-(function () {
+!function () {
 
 	Number.implement({
 		toRad: function() { return this * Math.PI/180; },
@@ -179,4 +179,4 @@ var deg = ['skew', 'rotate'],
 			}
 		}
 	})
-})();
+}();

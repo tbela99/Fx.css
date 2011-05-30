@@ -40,23 +40,11 @@ Fx.Morph.implement(Object.merge({
 		if(this.css) {
 
 			this.running = true;
-			this.element.setStyle('transition', 'none');
-
-			Object.each(from, function (value, property) {
-
-				value = Array.flatten(Array.from(value))[0];
-				this.element.setStyle(property, value.parser.serve(value.value))
-
-			}, this);
-
-			//console.log('all ' + this.options.duration + 'ms cubic-bezier(' + transitionTimings[this.options.transition] + ')')
-			this.element.addEvents(this.events).setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')');
-
-			Object.each(to, function (value, property) {
-
-				value = Array.flatten(Array.from(value))[0];
-				this.element.setStyle(property, value.parser.serve(value.value))
-			}, this);
+			this.element.setStyle('transition', 'none').
+				setStyles(Object.map(from, function (value) { return value.parser.serve(value.value)) }).
+				addEvents(this.events).
+				setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+				setStyles(Object.map(to, function (value) { return value.parser.serve(value.value)) });
 
 			return this
 		}

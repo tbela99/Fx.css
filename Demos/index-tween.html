@@ -36,7 +36,6 @@ body {
 }
 </style>
 <script type="text/javascript" src="../mootools.js"></script>
-<script type="text/javascript" src="../Source/sheet.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
@@ -64,8 +63,8 @@ body {
 
 				//console.log(this.get('tween').cancel());
 				this.get('tween').cancel()//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
-				//.start('transform', events[2].transform)
-				//.start('transform', events[3].transform)
+				.start('transform', events[2].transform)
+				.start('transform', events[3].transform)
 				.start('height', 250)
 				.start('height', 100);
 			})
