@@ -40,7 +40,7 @@ Fx.Morph.implement(Object.merge({
 		if(this.css) {
 
 			this.running = true;
-			this.element.setStyle('transition', 'none').
+			this.element.setStyle('transition', '').
 				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) })).
 				addEvents(this.events).
 				setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').

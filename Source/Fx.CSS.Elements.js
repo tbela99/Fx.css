@@ -77,7 +77,7 @@ provides: [Fx.CSS.Parsers.Transform]
 				
 				for(i in from) {
 
-					this.elements[i].setStyle('transition', 'none').
+					this.elements[i].setStyle('transition', '').
 									setStyles(Object.map(from[i], function (value, property) {
 
 										value = Array.flatten(Array.from(value))[0];
@@ -120,7 +120,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 				if(this.completed < this.elements.length) return this;
 
-				this.elements.each(function (el) { el.removeEvents(this.events).setStyle('transition', 'none') }, this);
+				this.elements.each(function (el) { el.removeEvents(this.events).setStyle('transition', '') }, this);
 				this.running = false
 			}
 

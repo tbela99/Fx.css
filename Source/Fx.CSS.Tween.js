@@ -49,7 +49,7 @@ Fx.Tween.implement(Object.merge({
 			from = from.parser.serve(from.value);
 			to = to.parser.serve(to.value);
 
-			if(args[1]) this.element.setStyle('transition', 'none').setStyle(property, from);
+			if(args[1]) this.element.setStyle('transition', '').setStyle(property, from);
 
 			this.element.addEvents(this.events).setStyle('transition', property.hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
 						setStyle(property, to);

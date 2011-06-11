@@ -34,6 +34,9 @@ provides: [FxCSS]
 			
 	function getPrefix(prop) {  
 	
+		//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
+		if(prop in div.style) return prop;
+	
 		var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
 		
 		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return prefixes[i] + upper; 
@@ -138,7 +141,7 @@ provides: [FxCSS]
 			//if(window.console && console.log) console.log(['completed', this.css]);
 			if(this.css && this.running) {
 
-				this.element.removeEvents(this.events).setStyle('transition', 'none');
+				this.element.removeEvents(this.events).setStyle('transition', '');
 				this.running = false
 			}
 
