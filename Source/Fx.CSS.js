@@ -57,7 +57,7 @@ provides: [FxCSS]
 	});
 
 	//eventTypes
-	['transitionStart', 'transitionEnd'/* , 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType){
+	['transitionStart', 'transitionEnd'/* , 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
 
 		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
@@ -69,11 +69,12 @@ provides: [FxCSS]
 		Element.NativeEvents[customType] = 2;
 		Element.Events[eventType.toLowerCase()] = {base: customType }
 		
-	}, this);
+	});
 	
 	//detect if transition property is supported
 	Fx.css3Transition = (function (prop) {
 	
+		//
 		if(prop in div.style) return true;
 		
 		var prefixes = ['Khtml','Moz','Webkit','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
@@ -111,14 +112,14 @@ provides: [FxCSS]
 	this.FxCSS = {
 
 		Binds: ['onComplete'],
-		initialize: function(element, options){
+		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
 			this.parent(Object.merge({transition: 'sine:in:out'}, options));
 			this.events = {transitionend: this.onComplete}
 		},
 
-		check: function(){
+		check: function() {
 
 			if (this.css) {
 
