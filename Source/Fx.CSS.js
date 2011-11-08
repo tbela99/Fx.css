@@ -22,15 +22,15 @@ provides: [FxCSS]
 ...
 */
 
-!function () {
-
+!function (context) {
+"use strict";
 
 	var set = Element.prototype.setStyle,
 		get = Element.prototype.getStyle,
 		//vendor = '',
 		div = new Element('div'),
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
-		prefixes = ['Khtml','Moz','Webkit','O','ms'];
+		prefixes = ['Khtml','O','ms','Moz','Webkit'];
 			
 	function getPrefix(prop) {  
 	
@@ -77,7 +77,7 @@ provides: [FxCSS]
 		//
 		if(prop in div.style) return true;
 		
-		var prefixes = ['Khtml','Moz','Webkit','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		var prefixes = ['Khtml','O','ms','Moz','Webkit'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
 		
 		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return true; 
 				
@@ -109,13 +109,13 @@ provides: [FxCSS]
 		'quint:in:out'	: '0.9,0,0.1,1'
 	};
 	
-	this.FxCSS = {
+	context.FxCSS = {
 
 		Binds: ['onComplete'],
 		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
-			this.parent(Object.merge({transition: 'sine:in:out'}, options));
+			this.parent(Object.append({transition: 'sine:in:out'}, options));
 			this.events = {transitionend: this.onComplete}
 		},
 
@@ -131,7 +131,7 @@ provides: [FxCSS]
 			switch (this.options.link) {
 
 				case 'cancel': this.cancel(); return true;
-				case 'chain': this.chain(this.caller.pass(arguments, this)); return false;
+				case 'chain': this.chain(this.caller.pass(Array.slice(arguments), this)); return false;
 			}
 
 			return false;
@@ -139,7 +139,7 @@ provides: [FxCSS]
 
 		onComplete: function () {
 
-			//if(window.console && console.log) console.log(['completed', this.css]);
+			//if(context.console && console.log) console.log(['completed', this.css]);
 			if(this.css && this.running) {
 
 				this.element.removeEvents(this.events).setStyle('transition', '');
@@ -164,4 +164,4 @@ provides: [FxCSS]
 		}
 	}
 
-}();
+}(this);

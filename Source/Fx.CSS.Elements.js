@@ -23,16 +23,17 @@ provides: [Fx.CSS.Parsers.Transform]
 */
 
 !function () {
+"use strict";
 
 	var stylesheet = new Stylesheet(),
 		span = new Element('span');
 
-	Fx.Elements.implement(Object.merge({}, FxCSS, {
+	Fx.Elements.implement(Object.append({}, FxCSS, {
 
 		initialize: function(elements, options){
 
 			this.elements = this.subject = $$(elements);
-			this.parent(Object.merge({transition: 'sine:in:out'}, options));
+			this.parent(Object.append({transition: 'sine:in:out'}, options));
 			this.events = {transitionend: this.onComplete}
 		},
 

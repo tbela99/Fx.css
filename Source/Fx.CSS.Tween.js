@@ -20,12 +20,14 @@ provides: none
 
 ...
 */
+!function () {
+"use strict";
 
-Fx.Tween.implement(Object.merge({
+Fx.Tween.implement(Object.append({
 
 	start: function(property, from, to) {
 
-		var args = Array.flatten(arguments), parsed;
+		var args = Array.flatten(Array.slice(arguments)), parsed;
 
 		property = this.options.property || args.shift();
 
@@ -66,4 +68,5 @@ Fx.Tween.implement(Object.merge({
 		return this.parent(parsed.from, parsed.to);
 	}
 
-}, FxCSS));
+}, FxCSS))
+}();;

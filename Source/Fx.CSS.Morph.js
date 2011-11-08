@@ -20,7 +20,11 @@ provides: none
 ...
 */
 
-Fx.Morph.implement(Object.merge({
+!function () {
+
+"use strict";
+
+Fx.Morph.implement(Object.append({
 
 	start: function(properties) {
 
@@ -53,4 +57,5 @@ Fx.Morph.implement(Object.merge({
 		this.locked = true;
 		return this.parent(from, to);
 	}
-}, FxCSS));
+}, FxCSS))
+}();
