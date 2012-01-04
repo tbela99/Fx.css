@@ -34,7 +34,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			this.elements = this.subject = $$(elements);
 			this.parent(Object.append({transition: 'sine:in:out'}, options));
-			this.events = {transitionend: this.onComplete}
+			this.events = {transitionend: this.stop}
 		},
 
 		start: function(obj){
@@ -113,7 +113,7 @@ provides: [Fx.CSS.Parsers.Transform]
 			return this.parent(from, to);
 		},
 
-		onComplete: function () {
+		stop: function () {
 
 			if(this.css && this.running) {
 

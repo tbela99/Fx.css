@@ -57,7 +57,7 @@ Fx.Tween.implement(Object.append({
 						setStyle(property, to);
 
 			//console.log([to, from, ['', 'transparent', 'auto', 'none'].indexOf(from)])
-			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.onComplete();
+			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.stop();
 
 			return this
 		}
