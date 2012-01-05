@@ -123,12 +123,12 @@ provides: [FxCSS]
 	
 	context.FxCSS = {
 
-		Binds: ['onComplete'],
+		Binds: ['stop'],
 		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
 			this.parent(Object.append({transition: 'sine:in:out'}, options));
-			this.events = {transitionend: this.onComplete}
+			this.events = {transitionend: this.stop}
 		},
 
 		check: function() {
@@ -149,13 +149,20 @@ provides: [FxCSS]
 			return false;
 		},
 
-		onComplete: function () {
+		stop: function () {
 
 			//if(context.console && console.log) console.log(['completed', this.css]);
 			if(this.css && this.running) {
 
 				this.element.removeEvents(this.events).setStyle('transition', '');
 				this.running = false
+				this.css = false;
+				this.locked = false;
+
+				this.fireEvent('complete', this.subject);
+				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
+
+				return this;
 			}
 
 			this.css = false;
