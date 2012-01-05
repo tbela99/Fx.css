@@ -69,7 +69,7 @@ var Stylesheet = new Class({
  
 	removeRule: function(index){
 		var sheet = this.sheet;
-		if($type(index) == 'string'){
+		if(typeof index == 'string'){
 			var selector = index.trim();
 			if(selector.contains(',')){
 				var selectors = selector.split(',');

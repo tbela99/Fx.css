@@ -30,29 +30,41 @@ provides: [FxCSS]
 		//vendor = '',
 		div = new Element('div'),
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
-		prefixes = ['Khtml','O','ms','Moz','Webkit'];
+		prefixes = ['Khtml','O','Ms','Moz','Webkit'],
+		cache = {};
 			
-	function getPrefix(prop) {  
-	
-		//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
-		if(prop in div.style) return prop;
-	
-		var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
-		
-		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return prefixes[i] + upper; 
-				
-		return prop;  
-	}  
-	
 	Element.implement({
 
+		getPrefixed: function (prop) {  
+		
+			prop = prop.camelCase();
+			
+			if(cache[prop] != undefined) return cache[prop];
+			
+			cache[prop] = prop
+		
+			//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
+			if(!(prop in this.style)) {
+				
+				var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+				
+				for(var i = prefixes.length; i--;) if(prefixes[i] + upper in this.style) {
+				
+					cache[prop] = prefixes[i] + upper; 
+					break;
+				}	
+			}
+					
+			return cache[prop];  
+		},  
+		
 		setStyle: function (property, value) {
 
-			return set.call(this, getPrefix(property), value);
+			return set.call(this, this.getPrefixed(property), value);
 		},
 		getStyle: function (property) {
 
-			return get.call(this, getPrefix(property));
+			return get.call(this, this.getPrefixed(property));
 		}
 	});
 

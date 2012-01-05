@@ -36,6 +36,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			from = Array.from(from);
 			to = Array.from(to);
+			
 			(Math.min(from.length, to.length)).times(function(i){
 
 				computed.push({value: from[i].parser.compute(from[i].value, to[i].value, delta), parser: from[i].parser});
@@ -56,7 +57,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			var parser, parsed;
 
-			if(property == 'transform') {
+			if(property.test(/^((Moz|Webkit|Ms|O|Khtml)T|t)ransform/)) {
 
 				parser = Fx.CSS.Parsers.Transform;
 				parsed = values.map(function (value) { return {value: parser.parse(value), parser: parser} })
