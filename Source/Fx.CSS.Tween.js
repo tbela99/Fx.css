@@ -35,7 +35,7 @@ Fx.Tween.implement(Object.append({
 
 		//console.log(
 		this.css = !this.locked && typeof this.options.transition == 'string' && Fx.css3Transition && Fx.transitionTimings[this.options.transition]
-					&& property != 'transform';
+					/* && property != 'transform' */;
 
 		this.property = property;
 
@@ -53,7 +53,7 @@ Fx.Tween.implement(Object.append({
 
 			if(args[1]) this.element.setStyle('transition', '').setStyle(property, from);
 
-			this.element.addEvents(this.events).setStyle('transition', property.hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+			this.element.addEvents(this.events).setStyle('transition', this.element.getPrefixed(property).hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
 						setStyle(property, to);
 
 			//console.log([to, from, ['', 'transparent', 'auto', 'none'].indexOf(from)])
