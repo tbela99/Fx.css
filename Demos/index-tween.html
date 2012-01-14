@@ -19,6 +19,9 @@ body {
 .square, .circle {
 
 	height: 100px;
+	/* -moz-transform: rotate(0);
+	-webkit-transform: rotate(0);
+	transform: rotate(0); */
 	width:100px;
 	margin: 0 auto;
 	cursor: pointer;
@@ -63,7 +66,7 @@ body {
 
 				//console.log(this.get('tween').cancel());
 				this.get('tween').cancel()//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
-				.start('transform', events[2].transform)
+				.start('transform', 'rotate(0)', events[2].transform)
 				.start('transform', events[3].transform)
 				.start('height', 250)
 				.start('height', 100);

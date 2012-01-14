@@ -86,8 +86,8 @@ provides: [Fx.CSS.Parsers.Transform]
 										return value.parser.serve(value.value)
 
 									})).
-									addEvents(this.events).
-									setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')');
+									setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+									addEvents(this.events);
 
 					css = '';
 					styles[i] = Object.map(to[i], function (value, property) {

@@ -41,7 +41,7 @@ provides: [FxCSS]
 			
 			if(cache[prop] != undefined) return cache[prop];
 			
-			cache[prop] = prop
+			cache[prop] = prop;
 		
 			//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
 			if(!(prop in this.style)) {
@@ -51,11 +51,11 @@ provides: [FxCSS]
 				for(var i = prefixes.length; i--;) if(prefixes[i] + upper in this.style) {
 				
 					cache[prop] = prefixes[i] + upper; 
-					break;
+					break
 				}	
 			}
 					
-			return cache[prop];  
+			return cache[prop]
 		},  
 		
 		setStyle: function (property, value) {
@@ -124,6 +124,9 @@ provides: [FxCSS]
 	context.FxCSS = {
 
 		Binds: ['stop'],
+		css: false,
+		locked: false,
+		running: false,
 		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
@@ -131,42 +134,32 @@ provides: [FxCSS]
 			this.events = {transitionend: this.stop}
 		},
 
-		check: function() {
-
-			if (this.css) {
-
-				if(!this.locked && !this.running) return true
-			}
-
-			else if (!this.timer) return true;
-
-			switch (this.options.link) {
-
-				case 'cancel': this.cancel(); return true;
-				case 'chain': this.chain(this.caller.pass(Array.slice(arguments), this)); return false;
-			}
-
-			return false;
+		isRunning: function () {
+		
+			//console.log('css: ' + this.css + ' locked: ' + this.locked + ' running: ' + this.running)
+			return this.css ? this.locked : this.parent()
 		},
-
+		
 		stop: function () {
 
-			//if(context.console && console.log) console.log(['completed', this.css]);
-			if(this.css && this.running) {
+			//console.log('stopped')
+			//this.css = false;
+			this.locked = false;
+			
+			//console.log('stop: ' + this.complete)
 
-				this.element.removeEvents(this.events).setStyle('transition', '');
-				this.running = false
+			//if(context.console && console.log) console.log(['completed', this.css]);
+			if(this.css/*  && this.running */) {
+
+				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
 				this.css = false;
-				this.locked = false;
+				this.running = false;
 
 				this.fireEvent('complete', this.subject);
 				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
 
 				return this;
 			}
-
-			this.css = false;
-			this.locked = false;
 
 			return this.parent()
 		},
@@ -176,7 +169,8 @@ provides: [FxCSS]
 			if (this.css && this.running) {
 
 				this.running = false;
-				this.css = false
+				this.css = false;
+				this.locked = false
 			}
 
 			return this.parent()

@@ -41,6 +41,8 @@ Fx.Tween.implement(Object.append({
 
 		parsed = this.prepare(this.element, property, args);
 
+		//chaining css animation && timer leads to unpredictable animation order
+		this.locked = true;
 		if(this.css) {
 
 			//console.log(JSON.encode([from, to]));
@@ -56,14 +58,11 @@ Fx.Tween.implement(Object.append({
 			this.element.addEvents(this.events).setStyle('transition', this.element.getPrefixed(property).hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
 						setStyle(property, to);
 
-			//console.log([to, from, ['', 'transparent', 'auto', 'none'].indexOf(from)])
 			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.stop();
 
 			return this
 		}
 
-		//chaining css animation && timer leads to unpredictable animation order
-		this.locked = true;
 
 		return this.parent(parsed.from, parsed.to);
 	}
