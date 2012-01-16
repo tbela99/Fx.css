@@ -69,7 +69,7 @@ provides: [FxCSS]
 	});
 
 	//eventTypes
-	['transitionStart', 'transitionEnd'/* , 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
+	['transitionStart', 'transitionEnd', 'animationStart', 'animationIteration', 'animationEnd' /* */].each(function(eventType) {
 
 		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
@@ -136,29 +136,46 @@ provides: [FxCSS]
 
 		isRunning: function () {
 		
-			//console.log('css: ' + this.css + ' locked: ' + this.locked + ' running: ' + this.running)
-			return this.css ? this.locked : this.parent()
+			//if(this.css) return this.css;
+			
+			return this.css || this.parent() || false
+		},
+		
+		createStyle: function (styles, className, cssText) {
+		
+			//console.log(arguments)
+		
+			var style = document.createElement('style'), 
+				styleString = cssText || '',
+				tmp = div.clone(false);
+			
+			tmp.style.cssText = '';
+			
+			Object.each(styles, function (value, key) { tmp.setStyle(key, value) });
+			
+			styleString =  '.' + className + '{' + styleString + tmp.style.cssText.split(';').map(function (value) { if(value.trim() != '') return value.replace(' !important', '') + ' !important' }).join(';') + '}';
+			
+			if(style.textContent != undefined) style.textContent = styleString;
+			else style.styleSheet.cssText = styleString;
+			
+			//console.log(styleString)
+			return style
 		},
 		
 		stop: function () {
 
-			//console.log('stopped')
-			//this.css = false;
-			this.locked = false;
-			
-			//console.log('stop: ' + this.complete)
+			if(this.css) {
 
-			//if(context.console && console.log) console.log(['completed', this.css]);
-			if(this.css/*  && this.running */) {
-
+				console.log('stop')
+				
 				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
-				this.css = false;
-				this.running = false;
-
 				this.fireEvent('complete', this.subject);
+				
 				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
 
-				return this;
+				this.css = false;
+				
+				return this
 			}
 
 			return this.parent()
@@ -166,11 +183,11 @@ provides: [FxCSS]
 
 		cancel: function() {
 
-			if (this.css && this.running) {
-
-				this.running = false;
+			if (this.css) {
+		
 				this.css = false;
-				this.locked = false
+				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
+				return this.fireEvent('cancel', this.subject).clearChain();
 			}
 
 			return this.parent()
