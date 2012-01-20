@@ -69,7 +69,7 @@ provides: [FxCSS]
 	});
 
 	//eventTypes
-	['transitionStart', 'transitionEnd', 'animationStart', 'animationIteration', 'animationEnd' /* */].each(function(eventType) {
+	['transitionStart', 'transitionEnd' /*, 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
 
 		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
@@ -141,24 +141,19 @@ provides: [FxCSS]
 			return this.css || this.parent() || false
 		},
 		
-		createStyle: function (styles, className, cssText) {
+		//looks like the problem here is !important
+		createStyle: function (from, to, fromName, toName) {
 		
-			//console.log(arguments)
-		
-			var style = document.createElement('style'), 
-				styleString = cssText || '',
-				tmp = div.clone(false);
+			var style = document.createElement('style'), styleString;
 			
-			tmp.style.cssText = '';
-			
-			Object.each(styles, function (value, key) { tmp.setStyle(key, value) });
-			
-			styleString =  '.' + className + '{' + styleString + tmp.style.cssText.split(';').map(function (value) { if(value.trim() != '') return value.replace(' !important', '') + ' !important' }).join(';') + '}';
+			style.type = 'text/css';
+			//debug
+			styleString =  '.' + fromName + '{\n\t' + from.replace(/;/g, ';\n\t') + '\n}' + '\n.' + toName + '{\n\t' + to.replace(/;/g, ';\n\t') + '\n}';
+			//styleString =  '.' + fromName + '{' + from+ '}' + '.' + toName + '{' + to + '}';
 			
 			if(style.textContent != undefined) style.textContent = styleString;
 			else style.styleSheet.cssText = styleString;
 			
-			//console.log(styleString)
 			return style
 		},
 		
@@ -168,13 +163,13 @@ provides: [FxCSS]
 
 				console.log('stop')
 				
+				this.css = false;
+				
 				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
 				this.fireEvent('complete', this.subject);
 				
 				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
 
-				this.css = false;
-				
 				return this
 			}
 
@@ -186,7 +181,7 @@ provides: [FxCSS]
 			if (this.css) {
 		
 				this.css = false;
-				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
+				this.element.removeEvents('transitionend').style[this.element.getPrefixed('transition')] = '';
 				return this.fireEvent('cancel', this.subject).clearChain();
 			}
 

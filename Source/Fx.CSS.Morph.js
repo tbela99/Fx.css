@@ -20,6 +20,18 @@ provides: none
 ...
 */
 
+//this is for debugging only
+Fx.Morph.implement({check: function(){
+		if (!this.isRunning()) return true;
+		switch (this.options.link){
+			case 'cancel': this.cancel(); return true;
+			case 'chain': console.log('chaining ', arguments); this.chain(this.caller.pass(arguments, this)); return false;
+		}
+		return false;
+	}
+});
+//
+	
 !function () {
 
 "use strict";
@@ -29,7 +41,7 @@ Fx.Morph.implement(Object.append({
 	start: function(properties) {
 
 		//false
-		// console.log('isRunning: ' + this.isRunning() + ' check (should be true): ' + this.check(properties));
+		console.log('start: isRunning: ' + this.isRunning(), properties);
 		// console.log(properties);
 		
 		if (!this.check(properties)) return this;
@@ -54,62 +66,43 @@ Fx.Morph.implement(Object.append({
 		if(this.css) {
 
 			var transition = this.element.getPrefixed('transition'), 
-				className = 'morphtmp' + String.uniqueID(),
+				fromClassName = 'morphftmp' + String.uniqueID(),
+				toClassName = 'morphttmp' + String.uniqueID(),
 				styles = Object.map(to, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }),
-				tmp = new Element('div'),
-				cssText,
-				changed = false;
-		
+				tmp = new Element('div');
+				
 			this.element.setStyle('transition', '').
-				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) })).
-				addEvents(this.events);
+				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }));
 				
-			cssText = this.element.style.cssText;
+			tmp.cssText = this.element.cssText;
+			tmp.setStyles(styles);
 			
-			if(Object.every(styles, function (value, key) { 
-			
-					//console.log()
-					return this.element.getStyle(key) == tmp.setStyle(key, value).getStyle(key) 
-			
-			}, this)) {
-			
-				console.log('unchanged!'); 
-				return this.stop();
-			}
-				
-			var style = this.createStyle(styles, className, transition.hyphenate() + ':all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ');');
-			
-			//this.element.style[transition] = 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')';
+			//we need to clear element styles and use css only from - to
+			var style = this.createStyle(this.element.style.cssText + transition.hyphenate() + ':all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ');', tmp.style.cssText, fromClassName, toClassName);
 			
 			document.head.grab(style);
 			
-			//check whether styles are changed
+			this.element.addClass(fromClassName).style.cssText = '';
 			
-			// console.log('transitionStart:' + className);
-			// console.log('transitionStart:' + className);
+			//console.log('this.element.style.cssText: ' + this.element.style.cssText)
 			
-			this.element /*.addEvent('transitionstart:once', function () {
+					//console.log('link: ' + this.options.link)
+			this.element.addEvent('transitionend:once', function () {
 			
-				console.log('transitionstart:' + className)
-			}).
-			addEvent('animationstart:once', function () {
-			
-				console.log('animationstart:' + className)
-			}).
-			addEvent('animationend:once', function () {
-			
-				console.log('animationend:' + className)
-			}) */.addEvent('transitionend:once', function () {
-			
-					console.log('transitionend:' + className)
+					console.log('transitionend:' + fromClassName + ' ' + toClassName)
 					//this.style[transition] = '';
-					this.style.cssText = cssText;
-					console.log('oldStyle: ' + cssText)
-					this.setStyles(styles).removeClass(className)
-					console.log('newStyle: ' + this.style.cssText)
+					this.style.cssText = tmp.style.cssText;
+					//console.log('oldStyle: ' + cssText);
+					this.removeClass(fromClassName).removeClass(toClassName);
+					
+					//check whether setting transform keep the value
+					//console.log(this.getStyle('transform'), styles)
+					//console.log('newStyle: ' + this.style.cssText)
+					console.log(style)
 					document.head.removeChild(style);
 					
-			}).addClass(className);
+			}).addEvents(this.events).addClass(toClassName);
+			
 
 			return this//.parent(from, to);
 		}
