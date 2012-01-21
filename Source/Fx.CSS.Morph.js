@@ -40,15 +40,10 @@ Fx.Morph.implement(Object.append({
 
 	start: function(properties) {
 
-		//false
-		console.log('start: isRunning: ' + this.isRunning(), properties);
-		// console.log(properties);
-		
+		//console.log('isRunning: ' + this.isRunning(), properties);
 		if (!this.check(properties)) return this;
 		
-		//	console.log('start:isRunning: ' + this.isRunning())
-
-		this.css = !this.locked && typeof this.options.transition == 'string' && Fx.transitionTimings[this.options.transition] && Fx.css3Transition;
+		this.css = typeof this.options.transition == 'string' && Fx.transitionTimings[this.options.transition] && Fx.css3Transition;
 					//&& !properties.transform;
 
 		if (typeof properties == 'string') properties = this.search(properties);
@@ -65,11 +60,14 @@ Fx.Morph.implement(Object.append({
 		
 		if(this.css) {
 
+			//console.log('start: ' + JSON.encode(properties));
+			
 			var transition = this.element.getPrefixed('transition'), 
 				fromClassName = 'morphftmp' + String.uniqueID(),
 				toClassName = 'morphttmp' + String.uniqueID(),
 				styles = Object.map(to, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }),
-				tmp = new Element('div');
+				tmp = new Element('div'),
+				keys = Object.keys(styles);
 				
 			this.element.setStyle('transition', '').
 				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }));
@@ -77,8 +75,40 @@ Fx.Morph.implement(Object.append({
 			tmp.cssText = this.element.cssText;
 			tmp.setStyles(styles);
 			
+			//check if styles are identical, element.style.borderRadius is an empty string in webkit, this will not work
+			if(keys.every(function (style) {
+			
+				style = this.element.getPrefixed(style);
+				
+				if((Browser.safari || Browser.chrome || Browser.Platform.ios) && style == 'borderRadius') {
+				
+					return tmp.style['borderTopLeftRadius'] == this.element.style['borderTopLeftRadius'] &&
+								tmp.style['borderTopRightRadius'] == this.element.style['borderTopRightRadius'] &&
+								tmp.style['borderBottomRightRadius'] == this.element.style['borderBottomRightRadius'] &&
+								tmp.style['borderBottomLeftRadius'] == this.element.style['borderBottomLeftRadius']
+				}
+				
+				return tmp.style[style] == this.element.style[style]
+				
+			}, this)) return this.stop();
+			
+			var now = Date.now();
+			
+				//console.log('now: ' + now)
+				//console.log('start: ' + JSON.encode(styles))
+			this.element.addEvent('transitionend:once', function () {
+			
+				console.log('elapsed: ' + (Date.now() - now))
+				console.log('to: ' + JSON.encode(styles))
+				console.log('stop: ' + JSON.encode(this.getStyles(keys)))
+			}).
+			addEvents(this.events).
+			setStyle(transition, 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+			setStyles(styles);
+			
+			/*
 			//we need to clear element styles and use css only from - to
-			var style = this.createStyle(this.element.style.cssText + transition.hyphenate() + ':all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ');', tmp.style.cssText, fromClassName, toClassName);
+			var style = this.createStyle(this.element.style.cssText, tmp.style.cssText, fromClassName, toClassName);
 			
 			document.head.grab(style);
 			
@@ -89,7 +119,8 @@ Fx.Morph.implement(Object.append({
 					//console.log('link: ' + this.options.link)
 			this.element.addEvent('transitionend:once', function () {
 			
-					console.log('transitionend:' + fromClassName + ' ' + toClassName)
+					console.log('transitionend:' + fromClassName + ' ' + toClassName);
+					console.log('stop: ' + this.style.cssText)
 					//this.style[transition] = '';
 					this.style.cssText = tmp.style.cssText;
 					//console.log('oldStyle: ' + cssText);
@@ -101,8 +132,9 @@ Fx.Morph.implement(Object.append({
 					console.log(style)
 					document.head.removeChild(style);
 					
-			}).addEvents(this.events).addClass(toClassName);
+			}).addEvents(this.events).setStyle(transition, 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').addClass(toClassName);
 			
+			*/
 
 			return this//.parent(from, to);
 		}

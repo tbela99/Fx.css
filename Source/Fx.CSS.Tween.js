@@ -20,7 +20,7 @@ provides: none
 
 ...
 */
-!function () {
+!function (undefined) {
 "use strict";
 
 Fx.Tween.implement(Object.append({
@@ -33,29 +33,23 @@ Fx.Tween.implement(Object.append({
 
 		if (!this.check(property, from, to)) return this;
 
-		//console.log(
-		this.css = !this.locked && typeof this.options.transition == 'string' && Fx.css3Transition && Fx.transitionTimings[this.options.transition]
-					/* && property != 'transform' */;
-
+		this.css = typeof this.options.transition == 'string' && Fx.transitionTimings[this.options.transition] && Fx.css3Transition;
 		this.property = property;
 
 		parsed = this.prepare(this.element, property, args);
 
-		//chaining css animation && timer leads to unpredictable animation order
-		this.locked = true;
 		if(this.css) {
 
-			//console.log(JSON.encode([from, to]));
-			this.running = true;
 			to = Array.flatten(Array.from(parsed.to))[0];
 			from = Array.flatten(Array.from(parsed.from))[0];
 
 			from = from.parser.serve(from.value);
 			to = to.parser.serve(to.value);
 
-			if(args[1]) this.element.setStyle('transition', '').setStyle(property, from);
+			if(args[1] != undefined) this.element.setStyle('transition', '').setStyle(property, from);
 
-			this.element.addEvents(this.events).setStyle('transition', this.element.getPrefixed(property).hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+			this.element.setStyle('transition', this.element.getPrefixed(property).hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+						addEvents(this.events).
 						setStyle(property, to);
 
 			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.stop();
@@ -63,9 +57,8 @@ Fx.Tween.implement(Object.append({
 			return this
 		}
 
-
 		return this.parent(parsed.from, parsed.to);
 	}
 
 }, FxCSS))
-}();;
+}();

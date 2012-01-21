@@ -41,7 +41,7 @@ body {
 <script type="text/javascript" src="../mootools.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Morph.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
 
 <script type="text/javascript">
 //<![CDATA[
@@ -55,16 +55,16 @@ body {
 				
 			document.getElements('.square, .circle').each(function (el) {
 			
-				console.log(el.getStyle('opacity'));
-				
-				el.set('morph', {duration: 1000, link: 'chain', onComplete: function() {
+				el.set('tween', {duration: 1000, link: 'chain', onComplete: function() {
 				
 					if(window.console && console.log) console.log(el)
 				}}).addEvent('click', function () {
 
-					this.get('morph').cancel()
-					.start(events[0])
-					.start(events[1]);
+					this.get('tween').cancel().
+					start('opacity', .1).
+					start('opacity', .5).
+					start('opacity', .5, .1).
+					start('opacity', .1, 1);
 				})
 			})
 	})

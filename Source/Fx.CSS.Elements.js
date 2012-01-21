@@ -10,7 +10,6 @@ authors:
 requires:
 Fx.CSS:
 - Fx.CSS
-- Stylesheet
 core/1.3:
 - Array
 - Element.Style
@@ -25,9 +24,6 @@ provides: [Fx.CSS.Parsers.Transform]
 !function () {
 "use strict";
 
-	var stylesheet = new Stylesheet(),
-		span = new Element('span');
-
 	Fx.Elements.implement(Object.append({}, FxCSS, {
 
 		initialize: function(elements, options){
@@ -41,26 +37,14 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			if (!this.check(obj)) return this;
 
-			this.css = !this.locked && typeof this.options.transition == 'string' && Fx.css3Transition && Fx.transitionTimings[this.options.transition];
-					//	&& !properties.transform;
+			this.css = typeof this.options.transition == 'string' && Fx.transitionTimings[this.options.transition] && Fx.css3Transition;
 
-			var from = {}, to = {}, classNames = {}, styles = {}, css, style, complete = function () { 
-			
-				for(var i in classNames) {
-				
-					stylesheet.removeRule('.' + classNames[i]);
-					this.elements[i].setStyles(styles[i]).removeClass(classNames[i]);
-				}
-				
-				this.removeEvent('complete', complete)
-			};
+			var from = {}, to = {}, styles = {};
 			
 			for (var i in obj) {
 			
-				if('transform' in obj[i]) this.css = false;
 				var iProps = obj[i], iFrom = from[i] = {}, iTo = to[i] = {};
 
-					//console.log([i, this.elements[i]])
 				for (var p in iProps){
 
 					var parsed = this.prepare(this.elements[i], p, iProps[p]);
@@ -71,10 +55,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 			if(this.css) {
 
-				this.running = true;
 				this.completed = 0;
-				
-				this.addEvent('complete', complete);
 				
 				for(i in from) {
 
@@ -89,44 +70,34 @@ provides: [Fx.CSS.Parsers.Transform]
 									setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
 									addEvents(this.events);
 
-					css = '';
-					styles[i] = Object.map(to[i], function (value, property) {
-
-						value = Array.flatten(Array.from(value))[0];
-						
-						style = span.setStyle(property, value.parser.serve(value.value)).getStyle(property);
-						for(p in styles) css +=  property.hyphenate() + ':' + style + ' !important;';
-						return style;
-						
-					});
-					
-					classNames[i] = 'clsTmp' + String.uniqueID();
-					stylesheet.addRule('.' + classNames[i], css);
-					this.elements[i].addClass(classNames[i])
+					styles[i] = Object.map(to[i], function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) })
 				}
+				
+				for(i in styles) this.elements[i].setStyles(styles[i]);
 
 				return this
 			}
-
-			this.locked = true;
 
 			return this.parent(from, to);
 		},
 
 		stop: function () {
 
-			if(this.css && this.running) {
+			if(this.css) {
 
 				this.completed++;
 
 				if(this.completed < this.elements.length) return this;
 
+				this.css = false;
 				this.elements.each(function (el) { el.removeEvents(this.events).setStyle('transition', '') }, this);
-				this.running = false
+				this.fireEvent('complete', this.subject);
+								
+				if(!this.callChain()) this.fireEvent('chainComplete', this.subject);
+
+				return this
 			}
 
-			this.css = false;
-			this.locked = false;
 			return this.parent()
 		}
 	}))

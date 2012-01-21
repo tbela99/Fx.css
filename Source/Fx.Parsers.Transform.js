@@ -21,7 +21,7 @@ provides: [Fx.CSS.Parsers.Transform]
 */
 
 //TODO: handle matrix style -> turn matrix to rotation & translation ?
-!function () {
+!function (undefined) {
 "use strict";
 
 	Number.implement({

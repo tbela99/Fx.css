@@ -29,6 +29,7 @@ provides: [FxCSS]
 		get = Element.prototype.getStyle,
 		//vendor = '',
 		div = new Element('div'),
+		transition,
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
 		prefixes = ['Khtml','O','Ms','Moz','Webkit'],
 		cache = {};
@@ -67,6 +68,8 @@ provides: [FxCSS]
 			return get.call(this, this.getPrefixed(property));
 		}
 	});
+	
+	transition = div.getPrefixed('transition');
 
 	//eventTypes
 	['transitionStart', 'transitionEnd' /*, 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
@@ -80,7 +83,6 @@ provides: [FxCSS]
 
 		Element.NativeEvents[customType] = 2;
 		Element.Events[eventType.toLowerCase()] = {base: customType }
-		
 	});
 	
 	//detect if transition property is supported
@@ -94,7 +96,7 @@ provides: [FxCSS]
 		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return true; 
 				
 		return false
-	})('transition');
+	})(transition);
 	
 	Fx.transitionTimings = {
 		'linear'		: '0,0,1,1',
@@ -125,8 +127,6 @@ provides: [FxCSS]
 
 		Binds: ['stop'],
 		css: false,
-		locked: false,
-		running: false,
 		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
@@ -136,39 +136,18 @@ provides: [FxCSS]
 
 		isRunning: function () {
 		
-			//if(this.css) return this.css;
-			
 			return this.css || this.parent() || false
-		},
-		
-		//looks like the problem here is !important
-		createStyle: function (from, to, fromName, toName) {
-		
-			var style = document.createElement('style'), styleString;
-			
-			style.type = 'text/css';
-			//debug
-			styleString =  '.' + fromName + '{\n\t' + from.replace(/;/g, ';\n\t') + '\n}' + '\n.' + toName + '{\n\t' + to.replace(/;/g, ';\n\t') + '\n}';
-			//styleString =  '.' + fromName + '{' + from+ '}' + '.' + toName + '{' + to + '}';
-			
-			if(style.textContent != undefined) style.textContent = styleString;
-			else style.styleSheet.cssText = styleString;
-			
-			return style
 		},
 		
 		stop: function () {
 
 			if(this.css) {
 
-				console.log('stop')
-				
 				this.css = false;
-				
-				this.element.removeEvents(this.events).style[this.element.getPrefixed('transition')] = '';
+				this.element.removeEvents(this.events).style[transition] = '';
 				this.fireEvent('complete', this.subject);
-				
-				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
+								
+				if(!this.callChain()) this.fireEvent('chainComplete', this.subject);
 
 				return this
 			}
@@ -181,7 +160,8 @@ provides: [FxCSS]
 			if (this.css) {
 		
 				this.css = false;
-				this.element.removeEvents('transitionend').style[this.element.getPrefixed('transition')] = '';
+				Array.from(this.subject).each(function (element) { element.removeEvents('transitionend').style[transition] = '' });
+				
 				return this.fireEvent('cancel', this.subject).clearChain();
 			}
 
