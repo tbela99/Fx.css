@@ -1,7 +1,7 @@
 Fx.CSS
 ============
 
-this plugin provides two features: animation of the css transform rule and css animations in Fx.Tween, Fx.Morph and Fx.Elements. there is no change required in your script.
+this plugin provides two features: animation of the css transform rule and css animations in Fx.Tween, Fx.Morph and Fx.Elements. there is no change required in your script, requires Mootools 1.4+
 
 - [Fx.Tween demo](http://tbela99.github.com/Fx.css/Demos/index-tween.html)
 - [Fx.Morph demo](http://tbela99.github.com/Fx.css/Demos/index-morph.html)

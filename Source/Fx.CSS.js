@@ -12,7 +12,7 @@ credits:
 - André Fiedler, eskimoblood (Fx.Tween.CSS3)
 
 requires:
-core/1.3:
+core/1.4:
 - Array
 - Element.Style
 - Fx.CSS
@@ -72,7 +72,7 @@ provides: [FxCSS]
 	transition = div.getPrefixed('transition');
 
 	//eventTypes
-	['transitionStart', 'transitionEnd' /*, 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
+	['transitionEnd' /*, 'transitionStart', 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
 
 		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
@@ -130,8 +130,7 @@ provides: [FxCSS]
 		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
-			this.parent(Object.append({transition: 'sine:in:out'}, options));
-			this.events = {transitionend: this.stop}
+			this.parent(Object.append({transition: 'sine:in:out'}, options))
 		},
 
 		isRunning: function () {
@@ -144,7 +143,7 @@ provides: [FxCSS]
 			if(this.css) {
 
 				this.css = false;
-				this.element.removeEvents(this.events).style[transition] = '';
+				this.subject.removeEvents('transitionend').setStyle(transition, '');
 				this.fireEvent('complete', this.subject);
 								
 				if(!this.callChain()) this.fireEvent('chainComplete', this.subject);
@@ -160,7 +159,7 @@ provides: [FxCSS]
 			if (this.css) {
 		
 				this.css = false;
-				Array.from(this.subject).each(function (element) { element.removeEvents('transitionend').style[transition] = '' });
+				Array.from(this.subject).each(function (element) { element.removeEvents('transitionend').style[transition] = '' }, this);
 				
 				return this.fireEvent('cancel', this.subject).clearChain();
 			}

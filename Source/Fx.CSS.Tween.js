@@ -11,7 +11,7 @@ authors:
 requires:
 Fx.CSS:
 - Fx.CSS
-core/1.3:
+core/1.4:
 - Array
 - Element.Style
 - Fx.Tween
@@ -49,7 +49,7 @@ Fx.Tween.implement(Object.append({
 			if(args[1] != undefined) this.element.setStyle('transition', '').setStyle(property, from);
 
 			this.element.setStyle('transition', this.element.getPrefixed(property).hyphenate() + ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
-						addEvents(this.events).
+						addEvent('transitionend', this.stop).
 						setStyle(property, to);
 
 			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.stop();
