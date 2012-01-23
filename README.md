@@ -30,7 +30,6 @@ css animations are not used when transform is one of the properties to be animat
 	<script script="Fx.CSS.js"></script>
 	<script script="Fx.CSS.Tween.js"></script>
 	<script script="Fx.CSS.Morph.js"></script>
-	<script script="Stylesheet.js"></script>
 	<script script="Fx.CSS.Elements.js"></script>
 	
 ### Javascript:
