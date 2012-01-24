@@ -7,6 +7,9 @@ license: MIT-style
 authors:
 - Thierry Bela
 
+contributor:
+- Andreas Schempp (https://github.com/aschempp)
+
 credits:
 - amadeus (CSSEvents)
 - André Fiedler, eskimoblood (Fx.Tween.CSS3)
