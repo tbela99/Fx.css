@@ -12,7 +12,7 @@ credits:
 - André Fiedler, eskimoblood (Fx.Tween.CSS3)
 
 requires:
-core/1.3:
+core/1.4:
 - Array
 - Element.Style
 - Fx.CSS
@@ -22,42 +22,57 @@ provides: [FxCSS]
 ...
 */
 
-!function () {
-
+!function (context) {
+"use strict";
 
 	var set = Element.prototype.setStyle,
 		get = Element.prototype.getStyle,
 		//vendor = '',
 		div = new Element('div'),
+		transition,
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
-		prefixes = ['Khtml','Moz','Webkit','O','ms'];
+		prefixes = ['Khtml','O','Ms','Moz','Webkit'],
+		cache = {};
 			
-	function getPrefix(prop) {  
-	
-		//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
-		if(prop in div.style) return prop;
-	
-		var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
-		
-		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return prefixes[i] + upper; 
-				
-		return prop;  
-	}  
-	
 	Element.implement({
 
+		getPrefixed: function (prop) {  
+		
+			prop = prop.camelCase();
+			
+			if(cache[prop] != undefined) return cache[prop];
+			
+			cache[prop] = prop;
+		
+			//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
+			if(!(prop in this.style)) {
+				
+				var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+				
+				for(var i = prefixes.length; i--;) if(prefixes[i] + upper in this.style) {
+				
+					cache[prop] = prefixes[i] + upper; 
+					break
+				}	
+			}
+					
+			return cache[prop]
+		},  
+		
 		setStyle: function (property, value) {
 
-			return set.call(this, getPrefix(property), value);
+			return set.call(this, this.getPrefixed(property), value);
 		},
 		getStyle: function (property) {
 
-			return get.call(this, getPrefix(property));
+			return get.call(this, this.getPrefixed(property));
 		}
 	});
+	
+	transition = div.getPrefixed('transition');
 
 	//eventTypes
-	['transitionStart', 'transitionEnd'/* , 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType){
+	['transitionEnd' /*, 'transitionStart', 'animationStart', 'animationIteration', 'animationEnd' */].each(function(eventType) {
 
 		Element.NativeEvents[eventType.toLowerCase()] = 2;
 
@@ -68,20 +83,20 @@ provides: [FxCSS]
 
 		Element.NativeEvents[customType] = 2;
 		Element.Events[eventType.toLowerCase()] = {base: customType }
-		
-	}, this);
+	});
 	
 	//detect if transition property is supported
 	Fx.css3Transition = (function (prop) {
 	
+		//
 		if(prop in div.style) return true;
 		
-		var prefixes = ['Khtml','Moz','Webkit','O','ms'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		var prefixes = ['Khtml','O','ms','Moz','Webkit'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
 		
 		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return true; 
 				
 		return false
-	})('transition');
+	})(transition);
 	
 	Fx.transitionTimings = {
 		'linear'		: '0,0,1,1',
@@ -108,59 +123,49 @@ provides: [FxCSS]
 		'quint:in:out'	: '0.9,0,0.1,1'
 	};
 	
-	this.FxCSS = {
+	context.FxCSS = {
 
-		Binds: ['onComplete'],
-		initialize: function(element, options){
+		Binds: ['stop'],
+		css: false,
+		initialize: function(element, options) {
 
 			this.element = this.subject = document.id(element);
-			this.parent(Object.merge({transition: 'sine:in:out'}, options));
-			this.events = {transitionend: this.onComplete}
+			this.parent(Object.append({transition: 'sine:in:out'}, options))
 		},
 
-		check: function(){
-
-			if (this.css) {
-
-				if(!this.locked && !this.running) return true
-			}
-
-			else if (!this.timer) return true;
-
-			switch (this.options.link) {
-
-				case 'cancel': this.cancel(); return true;
-				case 'chain': this.chain(this.caller.pass(arguments, this)); return false;
-			}
-
-			return false;
+		isRunning: function () {
+		
+			return this.css || this.parent() || false
 		},
+		
+		stop: function () {
 
-		onComplete: function () {
+			if(this.css) {
 
-			//if(window.console && console.log) console.log(['completed', this.css]);
-			if(this.css && this.running) {
+				this.css = false;
+				this.subject.removeEvents('transitionend').setStyle(transition, '');
+				this.fireEvent('complete', this.subject);
+								
+				if(!this.callChain()) this.fireEvent('chainComplete', this.subject);
 
-				this.element.removeEvents(this.events).setStyle('transition', '');
-				this.running = false
+				return this
 			}
-
-			this.css = false;
-			this.locked = false;
 
 			return this.parent()
 		},
 
 		cancel: function() {
 
-			if (this.css && this.running) {
-
-				this.running = false;
-				this.css = false
+			if (this.css) {
+		
+				this.css = false;
+				Array.from(this.subject).each(function (element) { element.removeEvents('transitionend').style[transition] = '' }, this);
+				
+				return this.fireEvent('cancel', this.subject).clearChain();
 			}
 
 			return this.parent()
 		}
 	}
 
-}();
+}(this);

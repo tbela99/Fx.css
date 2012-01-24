@@ -19,6 +19,9 @@ body {
 .square, .circle {
 
 	height: 100px;
+	/* -moz-transform: rotate(0);
+	-webkit-transform: rotate(0);
+	transform: rotate(0); */
 	width:100px;
 	margin: 0 auto;
 	cursor: pointer;
@@ -62,11 +65,14 @@ body {
 			el.set('tween', {duration: 1000, link: 'chain'/*, onComplete: function () { console.log('tween completed?') } */ }).addEvent('click', function () {
 
 				//console.log(this.get('tween').cancel());
-				this.get('tween').cancel()//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
-				.start('transform', events[2].transform)
-				.start('transform', events[3].transform)
-				.start('height', 250)
-				.start('height', 100);
+				this.get('tween').cancel().//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
+				start('transform', 'rotate(0)', events[2].transform).
+				start('transform', events[3].transform).
+				start('height', 250).
+				start('height', 100).
+				start('transform', events[0].transform[0], events[0].transform[1]).
+				start('transform', events[0].transform[0]).
+				start('transform', 'rotate(0deg) scale(1, 1) skew(0, 0) translate(0, 0)');
 			})
 		})
 	})

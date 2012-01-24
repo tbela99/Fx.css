@@ -10,11 +10,10 @@ authors:
 requires:
 Fx.CSS:
 - Fx.CSS
-- Stylesheet
 core/1.3:
 - Array
 - Element.Style
-more/1.3:
+more/1.4:
 - Fx.Elements
 
 provides: [Fx.CSS.Parsers.Transform]
@@ -23,43 +22,28 @@ provides: [Fx.CSS.Parsers.Transform]
 */
 
 !function () {
+"use strict";
 
-	var stylesheet = new Stylesheet(),
-		span = new Element('span');
-
-	Fx.Elements.implement(Object.merge({}, FxCSS, {
+	Fx.Elements.implement(Object.append({}, FxCSS, {
 
 		initialize: function(elements, options){
 
 			this.elements = this.subject = $$(elements);
-			this.parent(Object.merge({transition: 'sine:in:out'}, options));
-			this.events = {transitionend: this.onComplete}
+			this.parent(Object.append({transition: 'sine:in:out'}, options));
 		},
 
 		start: function(obj){
 
 			if (!this.check(obj)) return this;
 
-			this.css = !this.locked && typeof this.options.transition == 'string' && Fx.css3Transition && Fx.transitionTimings[this.options.transition];
-					//	&& !properties.transform;
+			this.css = typeof this.options.transition == 'string' && Fx.transitionTimings[this.options.transition] && Fx.css3Transition;
 
-			var from = {}, to = {}, classNames = {}, styles = {}, css, style, complete = function () { 
-			
-				for(var i in classNames) {
-				
-					stylesheet.removeRule('.' + classNames[i]);
-					this.elements[i].setStyles(styles[i]).removeClass(classNames[i]);
-				}
-				
-				this.removeEvent('complete', complete)
-			};
+			var from = {}, to = {}, styles = {};
 			
 			for (var i in obj) {
 			
-				if('transform' in obj[i]) this.css = false;
 				var iProps = obj[i], iFrom = from[i] = {}, iTo = to[i] = {};
 
-					//console.log([i, this.elements[i]])
 				for (var p in iProps){
 
 					var parsed = this.prepare(this.elements[i], p, iProps[p]);
@@ -67,66 +51,72 @@ provides: [Fx.CSS.Parsers.Transform]
 					iTo[p] = parsed.to;
 				}
 			}
-
+			
 			if(this.css) {
 
-				this.running = true;
-				this.completed = 0;
+				var total = 0, 
+						completed = 0,
+						transitionend = function (e) {
 				
-				this.addEvent('complete', complete);
-				
-				for(i in from) {
+							completed++;
+							
+							if(completed == total) {
 
+								this.elements.removeEvent('transitionend', transitionend); 
+								this.stop()
+							}
+
+						}.bind(this);
+				
+				Object.each(from, function (from, i) {
+				
 					this.elements[i].setStyle('transition', '').
-									setStyles(Object.map(from[i], function (value, property) {
+						setStyles(Object.map(from, function (value, property) {
 
-										value = Array.flatten(Array.from(value))[0];
+							value = Array.flatten(Array.from(value))[0];
 
-										return value.parser.serve(value.value)
+							return value.parser.serve(value.value)
 
-									})).
-									addEvents(this.events).
-									setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')');
-
-					css = '';
-					styles[i] = Object.map(to[i], function (value, property) {
-
-						value = Array.flatten(Array.from(value))[0];
-						
-						style = span.setStyle(property, value.parser.serve(value.value)).getStyle(property);
-						for(p in styles) css +=  property.hyphenate() + ':' + style + ' !important;';
-						return style;
-						
-					});
+						}));
+									
+					styles[i] = Object.map(to[i], function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) });
 					
-					classNames[i] = 'clsTmp' + String.uniqueID();
-					stylesheet.addRule('.' + classNames[i], css);
-					this.elements[i].addClass(classNames[i])
-				}
+					var tmp = new Element('div'), 
+						element = this.elements[i], 
+						keys = Object.keys(styles[i]);
+					
+					tmp.style.cssText = element.style.cssText;
+					tmp.setStyles(styles[i]);
+					total+= Object.getLength(styles[i]);
+					
+					//check if styles are identical
+					keys.each(function (style) {
+					
+						style = element.getPrefixed(style);
+						
+						//element.style.borderRadius is an empty string in webkit
+						if((Browser.safari || Browser.chrome || Browser.Platform.ios) && style == 'borderRadius') {
+						
+							if(tmp.style['borderTopLeftRadius'] == element.style['borderTopLeftRadius'] &&
+										tmp.style['borderTopRightRadius'] == element.style['borderTopRightRadius'] &&
+										tmp.style['borderBottomRightRadius'] == element.style['borderBottomRightRadius'] &&
+										tmp.style['borderBottomLeftRadius'] == element.style['borderBottomLeftRadius']) completed++;
+						}
+						
+						else if(tmp.style[style] == element.style[style]) completed++
+						
+					})
 
+				}, this);
+				
+				if(completed == total) return this.stop();
+				
+				for(i in styles) this.elements[i].setStyle('transition', 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').addEvent('transitionend', transitionend).setStyles(styles[i]);
+					
 				return this
 			}
 
-			this.locked = true;
-
 			return this.parent(from, to);
-		},
-
-		onComplete: function () {
-
-			if(this.css && this.running) {
-
-				this.completed++;
-
-				if(this.completed < this.elements.length) return this;
-
-				this.elements.each(function (el) { el.removeEvents(this.events).setStyle('transition', '') }, this);
-				this.running = false
-			}
-
-			this.css = false;
-			this.locked = false;
-			return this.parent()
 		}
 	}))
 	

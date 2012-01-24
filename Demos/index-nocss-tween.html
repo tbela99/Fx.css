@@ -61,12 +61,16 @@ body {
 			
 			el.set('tween', {duration: 1000, link: 'chain'/*, onComplete: function () { console.log('tween completed?') } */ }).addEvent('click', function () {
 
-				//console.log(this.get('tween').cancel());
-				this.get('tween').cancel()//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
-				.start('transform', events[2].transform)
-				.start('transform', events[3].transform)
-				.start('height', 250)
-				.start('height', 100);
+				this.get('tween').cancel()
+				.start({0: events[6], 1: events[6]})
+				.start({0: events[0], 1: events[0]})
+				.start({0: events[1], 1: events[1]})
+				.start({0: events[4], 1: events[4]})
+				.start({0: events[5], 1: events[5]})
+				.start({0: events[3], 1: events[3]})
+				.start({0: events[7], 1: events[7]})
+				.start({0: events[6], 1: events[6]})
+				.start({0: events[8], 1: events[8]})
 			})
 		})
 	})
