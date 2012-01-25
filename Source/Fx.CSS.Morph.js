@@ -49,21 +49,19 @@ Fx.Morph.implement(Object.append({
 			var transition = this.element.getPrefixed('transition'),
 				styles = Object.map(to, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }),
 				tmp = new Element('div'),
-				keys = Object.keys(styles),
+				keys,
 				element = this.element,
-				total = Object.getLength(styles),
-				completed = 0,
-				transitionend = function () {
+				css = ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')' ,
+				transitionend = function (e) {
 				
-					completed++;
-					if(completed == total) {
+					keys.shift();
+					if(keys.length == 0) {
 					
-						this.element.removeEvent('transitionend', transitionend); 
+						element.removeEvent('transitionend', transitionend); 
 						this.stop()
 					}
 					
 				}.bind(this);
-				
 				
 			this.element.setStyle(transition, '').
 				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }));
@@ -72,27 +70,27 @@ Fx.Morph.implement(Object.append({
 			tmp.setStyles(styles);
 			
 			//check if styles are identical
-			if(keys.each(function (style) {
+			keys = Object.keys(styles).filter(function (style) {
 			
 				style = element.getPrefixed(style);
 				
 				//element.style.borderRadius is an empty string in webkit, this will not work
 				if((Browser.safari || Browser.chrome || Browser.Platform.ios) && style == 'borderRadius') {
 				
-					if(tmp.style['borderTopLeftRadius'] == element.style['borderTopLeftRadius'] &&
+					return !(tmp.style['borderTopLeftRadius'] == element.style['borderTopLeftRadius'] &&
 								tmp.style['borderTopRightRadius'] == element.style['borderTopRightRadius'] &&
 								tmp.style['borderBottomRightRadius'] == element.style['borderBottomRightRadius'] &&
-								tmp.style['borderBottomLeftRadius'] == element.style['borderBottomLeftRadius']) completed++;
+								tmp.style['borderBottomLeftRadius'] == element.style['borderBottomLeftRadius']);
 				}
 				
-				else if(tmp.style[style] == element.style[style]) completed++
+				return !(tmp.style[style] == element.style[style]);
 				
-			}));
+			});
 
-			if(completed == total) return this.stop();
+			if(keys.length == 0) return this.stop();
 			
-			this.element.addEvent('transitionend', transitionend).
-			setStyle(transition, 'all ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')').
+			element.addEvent('transitionend', transitionend).
+			setStyle(transition, keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join()).
 			setStyles(styles);
 			
 			return this
