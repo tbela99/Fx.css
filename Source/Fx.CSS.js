@@ -30,7 +30,6 @@ provides: [FxCSS]
 
 	var set = Element.prototype.setStyle,
 		get = Element.prototype.getStyle,
-		//vendor = '',
 		div = new Element('div'),
 		transition,
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
@@ -102,36 +101,40 @@ provides: [FxCSS]
 	})(transition);
 	
 	Fx.transitionTimings = {
+		'ease': '.25,.1,.25,1',
+		'ease:in': '.42,0,1,1',
+		'ease:out': '0,0,.58,1',
+		'ease:in:out': '.42,0,.58,1',
 		'linear'		: '0,0,1,1',
-		'expo:in'		: '0.71,0.01,0.83,0',
-		'expo:out'		: '0.14,1,0.32,0.99',
-		'expo:in:out'	: '0.85,0,0.15,1',
-		'circ:in'		: '0.34,0,0.96,0.23',
-		'circ:out'		: '0,0.5,0.37,0.98',
-		'circ:in:out'	: '0.88,0.1,0.12,0.9',
-		'sine:in'		: '0.22,0.04,0.36,0',
-		'sine:out'		: '0.04,0,0.5,1',
-		'sine:in:out'	: '0.37,0.01,0.63,1',
-		'quad:in'		: '0.14,0.01,0.49,0',
-		'quad:out'		: '0.01,0,0.43,1',
-		'quad:in:out'	: '0.47,0.04,0.53,0.96',
-		'cubic:in'		: '0.35,0,0.65,0',
-		'cubic:out'		: '0.09,0.25,0.24,1',
-		'cubic:in:out'	: '0.66,0,0.34,1',
-		'quart:in'		: '0.69,0,0.76,0.17',
-		'quart:out'		: '0.26,0.96,0.44,1',
-		'quart:in:out'	: '0.76,0,0.24,1',
-		'quint:in'		: '0.64,0,0.78,0',
-		'quint:out'		: '0.22,1,0.35,1',
-		'quint:in:out'	: '0.9,0,0.1,1'
+		'expo:in'		: '.71,.01,.83,0',
+		'expo:out'		: '.14,1,.32,.99',
+		'expo:in:out'	: '.85,0,.15,1',
+		'circ:in'		: '.34,0,.96,.23',
+		'circ:out'		: '0,.5,.37,.98',
+		'circ:in:out'	: '.88,.1,.12,.9',
+		'sine:in'		: '.22,.04,.36,0',
+		'sine:out'		: '.04,0,.5,1',
+		'sine:in:out'	: '.37,.01,.63,1',
+		'quad:in'		: '.14,.01,.49,0',
+		'quad:out'		: '.01,0,.43,1',
+		'quad:in:out'	: '.47,.04,.53,.96',
+		'cubic:in'		: '.35,0,.65,0',
+		'cubic:out'		: '.09,.25,.24,1',
+		'cubic:in:out'	: '.66,0,.34,1',
+		'quart:in'		: '.69,0,.76,.17',
+		'quart:out'		: '.26,.96,.44,1',
+		'quart:in:out'	: '.76,0,.24,1',
+		'quint:in'		: '.64,0,.78,0',
+		'quint:out'		: '.22,1,.35,1',
+		'quint:in:out'	: '.9,0,.1,1'
 	};
 	
 	context.FxCSS = {
 
-		Binds: ['stop'],
 		css: false,
 		initialize: function(element, options) {
 
+			this.stop = this.stop.bind(this);
 			this.element = this.subject = document.id(element);
 			this.parent(Object.append({transition: 'sine:in:out'}, options))
 		},
