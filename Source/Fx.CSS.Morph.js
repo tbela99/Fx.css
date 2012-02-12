@@ -49,33 +49,25 @@ Fx.Morph.implement(Object.append({
 			var transition = this.element.getPrefixed('transition'),
 				styles = Object.map(to, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }),
 				tmp = new Element('div'),
-				keys,
+				//keys,
 				element = this.element,
-				css = ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')' ,
-				transitionend = function (e) {
+				css = ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')';
 				
-					keys.shift();
-					if(keys.length == 0) {
-					
-						element.removeEvent('transitionend', transitionend); 
-						this.stop()
-					}
-					
-				}.bind(this);
-				
-			this.element.setStyle(transition, '').
+			this.element.setStyle(transition, 'none').
 				setStyles(Object.map(from, function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) }));
 				
 			tmp.cssText = this.element.cssText;
 			tmp.setStyles(styles);
 			
-			//check if styles are identical
-			keys = Object.keys(styles).filter(function (style) {
+			this.keys = Object.keys(styles).map(function(style) {
 			
-				style = element.getPrefixed(style);
-				
+				return element.getPrefixed(style)
+			}).
+			//check if styles are unchanged
+			filter(function (style) {
+			
 				//element.style.borderRadius is an empty string in webkit, this will not work
-				if((Browser.safari || Browser.chrome || Browser.Platform.ios) && style == 'borderRadius') {
+				if(style == 'borderRadius') {
 				
 					return !(tmp.style['borderTopLeftRadius'] == element.style['borderTopLeftRadius'] &&
 								tmp.style['borderTopRightRadius'] == element.style['borderTopRightRadius'] &&
@@ -87,10 +79,10 @@ Fx.Morph.implement(Object.append({
 				
 			});
 
-			if(keys.length == 0) return this.stop();
+			if(this.keys.length == 0) return this.stop();
 			
-			element.addEvent('transitionend', transitionend).
-			setStyle(transition, keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join()).
+			element.addEvent('transitionend', this.transitionend).
+			setStyle(transition, this.keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join()).
 			setStyles(styles);
 			
 			return this

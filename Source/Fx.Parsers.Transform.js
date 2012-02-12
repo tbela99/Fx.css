@@ -81,13 +81,20 @@ var deg = ['skew', 'rotate'],
 	deg = deg.concat(coordinates.map(function (side) { return deg[0] + side })).concat(coordinates.map(function (side) { return deg[1] + side }));
 	
 	Object.append(Element.Styles, {
-	
-			rgba: 'rgba(@, @, @, @)',
-			borderRadius: '@px @px @px @px',
-			boxShadow: 'rgb(@, @, @) @px @px @px',
-			textShadow: '@px @px @px rgb(@, @, @)'
-		});
 
+		rgba: 'rgba(@, @, @, @)',
+		borderRadius: '@px @px @px @px',
+		boxShadow: 'rgb(@, @, @) @px @px @px',
+		textShadow: '@px @px @px rgb(@, @, @)'
+	});
+		
+	Object.append(Element.ShortStyles, {
+	
+		borderTopLeftRadius: '@px',
+		borderTopRightRadius: '@px',
+		borderBottomLeftRadius: '@px',
+		borderBottomRightRadius: '@px'
+	});
 
 	Object.append(Fx.CSS.Parsers, {
 
@@ -112,7 +119,7 @@ var deg = ['skew', 'rotate'],
 
 				if(px.every(function (t) {
 
-					if((match = value.match(new RegExp(t + '\\(' + number + '(px)?\\s*(,' + number + '(px)?\\s*)?\\)', 'i')))) {
+					if((match = value.match(new RegExp(t + '\\(' + number + '(px)?\\s*(,' + number + '(px)?\\s*)\\)', 'i')))) {
 
 						var x = parseFloat(match[1]),
 							y = parseFloat(match[6]);
@@ -129,19 +136,31 @@ var deg = ['skew', 'rotate'],
 						else transform[t] = x
 					}
 
+					else if((match = value.match(new RegExp(t + '\\(' + number + '(px)?\\s*\\)', 'i')))) {
+
+						var x = parseFloat(match[1]);
+
+						//allow optional unit for 0
+						if(!match[4] && x != 0) return false;
+
+						transform[t] = x
+					}
+
 					return true
-				}) && deg.every(function (t) {
+				}) && 
+				
+				deg.every(function (t) {
 
 					//1 - number
 					//4 - unit
 					//5 - number defined
 					//6 - number
 					//9 - unit
-					if((match = value.match(new RegExp(t + '\\(' + number + '(deg|rad)?\\s*(,' + number + '(deg|rad)?)?\\s*\\)', 'i')))) {
+					if((match = value.match(new RegExp(t + '\\(' + number + '(deg|rad)?\\s*(,' + number + '(deg|rad)?)\\s*\\)')))) {
 
 						var x = parseFloat(match[1]),
 							y = parseFloat(match[6]);
-
+							
 						//allow optional unit for 0
 						if(!match[4] && x != 0) return false;
 						
@@ -154,10 +173,20 @@ var deg = ['skew', 'rotate'],
 						else transform[t] = match[4] == 'rad' ? parseFloat(match[1]).toDeg() : parseFloat(match[1])
 					}
 
+					else if((match = value.match(new RegExp(t + '\\(' + number + '(deg|rad)?\\s*\\)')))) {
+
+						var x = parseFloat(match[1]);
+							
+						//allow optional unit for 0
+						if(!match[4] && x != 0) return false;
+						
+						transform[t] = match[4] == 'rad' ? parseFloat(match[1]).toDeg() : parseFloat(match[1])
+					}
+
 					return true
 				}) && generics.every(function (t) {
 
-					if((match = value.match(new RegExp(t + '\\(\\s*(([0-9]*\\.)?[0-9]+)\\s*(,\\s*(([0-9]*\\.)?[0-9]+)\\s*)?\\)', 'i')))) {
+					if((match = value.match(new RegExp(t + '\\(\\s*(([0-9]*\\.)?[0-9]+)\\s*(,\\s*(([0-9]*\\.)?[0-9]+)\\s*)?\\)')))) {
 
 						if(match[3]) transform[t] = [parseFloat(match[1]), parseFloat(match[4])];
 
@@ -167,7 +196,7 @@ var deg = ['skew', 'rotate'],
 					return true
 
 				})) return Object.getLength(transform) == 0 ? false : transform;
-
+				
 				return false
 			},
 			compute: function(from, to, delta){
@@ -208,7 +237,6 @@ var deg = ['skew', 'rotate'],
 				if(transform.translate3d) style += ' translate3d(' + transform.translate3d[0]+ 'px,' + transform.translate3d[1]+ 'px,' + transform.translate3d[2]+ 'px)';
 				if(transform.rotate3d) style += ' rotate3d(' + transform.rotate3d[0]+ ',' + transform.rotate3d[1]+ ',' + transform.rotate3d[2]+ ', ' + transform.rotate3d[4] + 'deg)';
 				
-				//console.log(style)
 				return style
 			}
 		}

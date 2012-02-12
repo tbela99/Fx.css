@@ -3,7 +3,7 @@
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>Fx.CSS Morph</title>
+<title>Fx.CSS Tween Border Color no css</title>
 <style type="text/css">
 html {
 
@@ -39,9 +39,6 @@ body {
 }
 </style>
 <script type="text/javascript" src="../mootools.js"></script>
-<script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -49,11 +46,6 @@ body {
 
 	window.addEvent('domready', function () {
 
-		var value,
-			events = [{opacity: .1},
-					{opacity: 1}
-				];
-				
 			document.getElements('.square, .circle').each(function (el) {
 			
 				el.set('tween', {duration: 1000, link: 'chain', onComplete: function() {
@@ -62,10 +54,10 @@ body {
 				}}).addEvent('click', function () {
 
 					this.get('tween').cancel().
-					start('opacity', .1).
-					start('opacity', .5).
-					start('opacity', .5, .1).
-					start('opacity', .1, 1);
+					start('border-color', '#DE3434').
+					start('border-color', '#2F4C74').
+					start('border-color', '#000', '#F5F41E').
+					start('border-color', '#000', '#fff');
 				})
 			})
 	})

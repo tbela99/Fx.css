@@ -28,49 +28,12 @@ provides: [FxCSS]
 !function (context) {
 "use strict";
 
-	var set = Element.prototype.setStyle,
-		get = Element.prototype.getStyle,
-		div = new Element('div'),
+	var div = new Element('div'),
 		transition,
 		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
 		prefixes = ['Khtml','O','Ms','Moz','Webkit'],
 		cache = {};
 			
-	Element.implement({
-
-		getPrefixed: function (prop) {  
-		
-			prop = prop.camelCase();
-			
-			if(cache[prop] != undefined) return cache[prop];
-			
-			cache[prop] = prop;
-		
-			//return unprefixed property if supported. prefixed properties sometimes do not work fine (MozOpacity is an empty string in FF4)
-			if(!(prop in this.style)) {
-				
-				var upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
-				
-				for(var i = prefixes.length; i--;) if(prefixes[i] + upper in this.style) {
-				
-					cache[prop] = prefixes[i] + upper; 
-					break
-				}	
-			}
-					
-			return cache[prop]
-		},  
-		
-		setStyle: function (property, value) {
-
-			return set.call(this, this.getPrefixed(property), value);
-		},
-		getStyle: function (property) {
-
-			return get.call(this, this.getPrefixed(property));
-		}
-	});
-	
 	transition = div.getPrefixed('transition');
 
 	//eventTypes
@@ -93,9 +56,9 @@ provides: [FxCSS]
 		//
 		if(prop in div.style) return true;
 		
-		var prefixes = ['Khtml','O','ms','Moz','Webkit'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		var i = prefixes.length, prefixes = ['Khtml','O','ms','Moz','Webkit'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
 		
-		for(var i = prefixes.length; i--;) if(prefixes[i] + upper in div.style) return true; 
+		while(i && i--) if(prefixes[i] + upper in div.style) return true;
 				
 		return false
 	})(transition);
@@ -129,27 +92,78 @@ provides: [FxCSS]
 		'quint:in:out'	: '.9,0,.1,1'
 	};
 	
+	//borderBottomLeftRadius
+
 	context.FxCSS = {
 
 		css: false,
+		propRegExp: /([a-z]+)([A-Z][a-z]+)([A-Z].+)/,
+		propRadiusRegExp: /([a-z]+)([A-Z][a-z]+)([A-Z][a-z]+)(Radius)/,
 		initialize: function(element, options) {
 
-			this.stop = this.stop.bind(this);
 			this.element = this.subject = document.id(element);
+			this.transitionend = this.transitionend.bind(this);
 			this.parent(Object.append({transition: 'sine:in:out'}, options))
 		},
-
-		isRunning: function () {
+		isRunning: function () { return this.css || this.parent() || false },
+		checkTransition: function (style, keys) {
 		
-			return this.css || this.parent() || false
+			style = div.getPrefixed(style);
+			
+			var index = keys.indexOf(style);
+			
+			//is this browser extending shorthand properties ?
+			if(index == -1) {
+			
+				if(this.propRadiusRegExp.test(style)) {
+				
+					var matches = this.propRadiusRegExp.exec(style);
+					
+					index = keys.indexOf(matches[1] + matches[4]);
+					
+					if(index != -1) {
+						
+						keys.splice(index, 1);
+						keys.append(['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight'].
+							map(function (prop) { return matches[1] + prop + matches[4] }));
+							
+						index = keys.indexOf(style)	
+					}			
+				}
+				else if(this.propRegExp.test(style)) {
+				
+					var matches = this.propRegExp.exec(style);
+					
+					index = keys.indexOf(matches[1] + matches[3]);
+					
+					if(index != -1) {
+						
+						keys.splice(index, 1);
+						keys.append(['Left', 'Top', 'Right', 'Bottom'].
+							map(function (prop) { return matches[1] + prop + matches[3] }));
+							
+						index = keys.indexOf(style)	
+					}			
+				}
+			}
+			
+			if(index != -1) keys.splice(index, 1);
+			
+			return keys.length == 0
 		},
-		
+		transitionend: function (e) {
+				
+			if(this.checkTransition(e.event.propertyName, this.keys)) {
+			
+				this.subject.removeEvent('transitionend', this.transitionend).style[transition] = ''; 
+				this.stop()
+			}	
+		},
 		stop: function () {
 
 			if(this.css) {
 
 				this.css = false;
-				this.subject.removeEvents('transitionend').setStyle(transition, '');
 				this.fireEvent('complete', this.subject);
 								
 				if(!this.callChain()) this.fireEvent('chainComplete', this.subject);
@@ -159,7 +173,6 @@ provides: [FxCSS]
 
 			return this.parent()
 		},
-
 		cancel: function() {
 
 			if (this.css) {

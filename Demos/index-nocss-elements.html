@@ -36,6 +36,7 @@ body {
 }
 </style>
 <script type="text/javascript" src="../mootools.js"></script>
+<script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -51,16 +52,22 @@ body {
 					{color: '#fff', backgroundColor: '#000', borderColor: '#245884'},
 					{height: 250, width: 300, transform: 'rotate(157deg)'},
 					{height: 100, width: 100, transform: 'rotate(0)'},
-					{height: 300, width: 250, transform: 'rotate(20deg)'}
+					{height: 300, width: 250, transform: 'rotate(20deg)'},
+					{color: '#000', backgroundColor: '#fff', borderColor: '#000'}
 				],
 				
 			elements = document.getElements('.square, .circle').addEvent('click', function () {
 
 				fx.cancel()
-				.start({0: {height: 50, width: 20}, 1: {height: 75, width:80}})
-				.start({0: {height: 100, width: 100}, 1: {height: 100, width: 100}})
-				.start({0: {height: 375, width: 150}, 1: {height: 10, width: 10}})
-				.start({0: {height: 100, width: 100}, 1: {height: 100, width: 100}})//.start({0: events[0], 1: events[0]}).start({0: events[4], 1: events[6]}).start({0: events[5], 1: events[5]})
+				.start({0: events[6], 1: events[6]})
+				.start({0: events[0], 1: events[0]})
+				.start({0: events[1], 1: events[1]})
+				.start({0: events[4], 1: events[4]})
+				.start({0: events[5], 1: events[5]})
+				.start({0: events[3], 1: events[3]})
+				.start({0: events[7], 1: events[7]})
+				.start({0: events[6], 1: events[6]})
+				.start({0: events[8], 1: events[8]})
 			}),
 			fx = new Fx.Elements(elements, {link: 'chain', duration: 1000})	
 	})
