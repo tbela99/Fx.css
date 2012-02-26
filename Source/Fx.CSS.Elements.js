@@ -41,7 +41,7 @@ provides: [Fx.CSS.Parsers.Transform]
 
 					this.subject.removeEvent('transitionend', this.transitionend).setStyle('transition', ''); 
 					this.stop()
-				}	
+				}
 			}
 		},
 		start: function(obj){
