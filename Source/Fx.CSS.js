@@ -56,7 +56,7 @@ provides: [FxCSS]
 		//
 		if(prop in div.style) return true;
 		
-		var i = prefixes.length, prefixes = ['Khtml','O','ms','Moz','Webkit'], upper = prop.charAt(0).toUpperCase() + prop.slice(1); 
+		var prefixes = ['Khtml','O','ms','Moz','Webkit'], i = prefixes.length, upper = prop.charAt(0).toUpperCase() + prop.slice(1);
 		
 		while(i && i--) if(prefixes[i] + upper in div.style) return true;
 				
