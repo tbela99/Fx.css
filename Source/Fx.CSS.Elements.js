@@ -70,13 +70,14 @@ provides: [Fx.CSS.Parsers.Transform]
 			
 				var css = ' ' + this.options.duration + 'ms cubic-bezier(' + Fx.transitionTimings[this.options.transition] + ')',
 					transitions = {},
+					elements = this.elements,
 					tmp = new Element('div');
 						
 				this.keys = {};
 				
 				Object.each(from, function (from, i) {
 				
-					var element = this.elements[i];
+					var element = elements[i];
 					
 					element.setStyle('transition', 'none').
 						setStyles(Object.map(from, function (value, property) {
@@ -84,16 +85,15 @@ provides: [Fx.CSS.Parsers.Transform]
 							value = Array.flatten(Array.from(value))[0];
 
 							return value.parser.serve(value.value)
-
 						}));
-								
+												
 					styles[i] = Object.map(to[i], function (value) { value = Array.from(value)[0]; return value.parser.serve(value.value) });
 					
 					tmp.style.cssText = element.style.cssText;
 					tmp.setStyles(styles[i]);
 					
 					//check if styles are identical
-					this.keys[i] = Object.keys(styles[i]).filter(function (style) {
+					this.keys[i] = Object.keys(styles[i]).filter(function (style) {	
 					
 						style = element.getPrefixed(style);
 								
@@ -115,12 +115,14 @@ provides: [Fx.CSS.Parsers.Transform]
 				
 				if(Object.every(this.keys, function (keys) { return keys.length == 0 })) return this.stop();
 				
-				for(i in styles) this.elements[i].setStyle('transition', transitions[i]).addEvent('transitionend', this.transitionend).setStyles(styles[i]);
+				for(i in styles) elements[i].setStyle('transition', transitions[i]).addEvent('transitionend', this.transitionend);
+				
+				for(i in styles) elements[i].setStyles(styles[i]);
 				
 				return this
 			}
 
-			return this.parent(from, to);
+			return this.parent(from, to)
 		}
 	}))
 	

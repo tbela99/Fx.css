@@ -23,11 +23,11 @@ provides: [Fx.CSS.Parsers.Transform]
 //TODO: handle matrix style -> turn matrix to rotation & translation ?
 !function (undefined) {
 "use strict";
-
+/* 
 	Number.implement({
 		toRad: function() { return this * Math.PI/180; },
 		toDeg: function() { return this * 180/Math.PI; }
-	});
+	}); */
 
 	Fx.CSS.implement({
 
@@ -74,7 +74,9 @@ var deg = ['skew', 'rotate'],
 	px = ['translate'],
 	generics = ['scale'],
 	coordinates = ['X', 'Y', 'Z'], 
-	number = '\\s*([-+]?([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)';
+	number = '\\s*([-+]?([0-9]*\.)?[0-9]+(e[+-]?[0-9]+)?)',
+	degunit = 'deg|rad',
+	pxunit = 'px|%';
 
 	px = px.concat(coordinates.map(function (side) { return px[0] + side }));
 	generics = generics.concat(coordinates.map(function (side) { return generics[0] + side }));
@@ -107,19 +109,19 @@ var deg = ['skew', 'rotate'],
 				var transform = {}, 
 					match;
 				
-				if((match = value.match(new RegExp('translate3d\\((' + number + ')(px)?\\s*,\\s*('+ number + ')(px)?\\s*,\\s*(' + number + ')(px)?\\s*\\)')))) {
+				if((match = value.match(new RegExp('translate3d\\((' + number + ')(' + pxunit + ')?\\s*,\\s*('+ number + ')(' + pxunit + ')?\\s*,\\s*(' + number + ')(' + pxunit + ')?\\s*\\)')))) {
 				
-					transform.translate3d = [parseFloat(match[1]), parseFloat(match[6]), parseFloat(match[12])]
+					transform.translate3d = {value: [parseFloat(match[1]), parseFloat(match[6]), parseFloat(match[12])], unit: match[5] || match[7] || match[13] || ''}
 				}
 
-				if((match = value.match(new RegExp('rotate3d\\(\\s*(' + number + ')\\s*,\\s*('+ number + ')\\s*,\\s*(' + number + ')\\s*,\\s*(' + number + ')(deg|rad)?\\s*\\)')))) {
+				if((match = value.match(new RegExp('rotate3d\\(\\s*(' + number + ')\\s*,\\s*('+ number + ')\\s*,\\s*(' + number + ')\\s*,\\s*(' + number + ')(' + degunit + ')?\\s*\\)')))) {
 				
-					transform.rotate3d = [parseFloat(match[1]), parseFloat(match[5]), parseFloat(match[9]), match[17] == 'rad' ? parseFloat(match[13]).toDeg() : parseFloat(match[13])]
+					transform.rotate3d = {value: [parseFloat(match[1]), parseFloat(match[5]), parseFloat(match[9]), parseFloat(match[13])], unit: match[17] || ''}
 				}
 
 				if(px.every(function (t) {
 
-					if((match = value.match(new RegExp(t + '\\(' + number + '(px)?\\s*(,' + number + '(px)?\\s*)\\)', 'i')))) {
+					if((match = value.match(new RegExp(t + '\\(' + number + '(' + pxunit + ')?\\s*(,' + number + '(' + pxunit + ')?\\s*)\\)', 'i')))) {
 
 						var x = parseFloat(match[1]),
 							y = parseFloat(match[6]);
@@ -130,20 +132,20 @@ var deg = ['skew', 'rotate'],
 						if(match[5]) {
 
 							if(!match[9] && y != 0) return false;
-							transform[t] = [x, y]
+							transform[t] = {value: [x, y], unit: match[4] || ''}
 						}
 
-						else transform[t] = x
+						else transform[t] = {value: x, unit: match[4] || ''}
 					}
 
-					else if((match = value.match(new RegExp(t + '\\(' + number + '(px)?\\s*\\)', 'i')))) {
+					else if((match = value.match(new RegExp(t + '\\(' + number + '(' + pxunit + ')?\\s*\\)', 'i')))) {
 
 						var x = parseFloat(match[1]);
 
 						//allow optional unit for 0
 						if(!match[4] && x != 0) return false;
 
-						transform[t] = x
+						transform[t] = {value: x, unit: match[4] || ''}
 					}
 
 					return true
@@ -156,7 +158,7 @@ var deg = ['skew', 'rotate'],
 					//5 - number defined
 					//6 - number
 					//9 - unit
-					if((match = value.match(new RegExp(t + '\\(' + number + '(deg|rad)?\\s*(,' + number + '(deg|rad)?)\\s*\\)')))) {
+					if((match = value.match(new RegExp(t + '\\(' + number + '(' + degunit + ')?\\s*(,' + number + '(' + degunit + ')?)\\s*\\)')))) {
 
 						var x = parseFloat(match[1]),
 							y = parseFloat(match[6]);
@@ -167,20 +169,20 @@ var deg = ['skew', 'rotate'],
 						if(match[5]) {
 
 							if(!match[9] && y != 0) return false;
-							transform[t] = [match[5] == 'rad' ? parseFloat(match[1]).toDeg() : parseFloat(match[1]), match[9] == 'rad' ? parseFloat(match[6]).toDeg() : parseFloat(match[6])]
+							transform[t] = {value: [parseFloat(match[1]), parseFloat(match[6])], unit: match[5]}
 						}
 
-						else transform[t] = match[4] == 'rad' ? parseFloat(match[1]).toDeg() : parseFloat(match[1])
+						else transform[t] = {value: parseFloat(match[1]), unit: match[4]}
 					}
 
-					else if((match = value.match(new RegExp(t + '\\(' + number + '(deg|rad)?\\s*\\)')))) {
+					else if((match = value.match(new RegExp(t + '\\(' + number + '(' + degunit + ')?\\s*\\)')))) {
 
 						var x = parseFloat(match[1]);
 							
 						//allow optional unit for 0
 						if(!match[4] && x != 0) return false;
 						
-						transform[t] = match[4] == 'rad' ? parseFloat(match[1]).toDeg() : parseFloat(match[1])
+						transform[t] = {value: parseFloat(match[1]), unit: match[4] || ''}
 					}
 
 					return true
@@ -226,16 +228,23 @@ var deg = ['skew', 'rotate'],
 
 					if(transform[t] != null) {
 
-						if(transform[t] instanceof Array) style +=  t + '(' + transform[t].map(function (val) { return val + 'deg' }) + ') ';
-						else style += t + '(' + transform[t] + 'deg) '
+						if(transform[t].value instanceof Array) style +=  t + '(' + transform[t].value.map(function (val) { return val + transform[t].unit }) + ') ';
+						else style += t + '(' + transform[t].value + transform[t].unit + ') '
 					}
 				});
 
-				px.each(function (t) { if(transform[t] != null) style += t + '(' + Array.from(transform[t]).map(function (value) { return value + 'px' }) + ') ' });
+				px.each(function (t) {
+				
+					if(transform[t] != null) {
+					
+						style += t + '(' + Array.from(transform[t].value).map(function (value) { return value + transform[t].unit }) + ') ' 
+					} 
+				});
+				
 				generics.each(function (t) { if(transform[t] != null) style += t + '(' + transform[t] + ') ' });
 
-				if(transform.translate3d) style += ' translate3d(' + transform.translate3d[0]+ 'px,' + transform.translate3d[1]+ 'px,' + transform.translate3d[2]+ 'px)';
-				if(transform.rotate3d) style += ' rotate3d(' + transform.rotate3d[0]+ ',' + transform.rotate3d[1]+ ',' + transform.rotate3d[2]+ ', ' + transform.rotate3d[4] + 'deg)';
+				if(transform.translate3d) style += ' translate3d(' + transform.translate3d.value[0]+ transform + transform.translate3d.unit + ',' + transform.translate3d.value[1] +  + transform.translate3d.unit + ',' + transform.translate3d.value[2]+  + transform.translate3d.unit + ')';
+				if(transform.rotate3d) style += ' rotate3d(' + transform.rotate3d.value[0]+ ',' + transform.rotate3d.value[1]+ ',' + transform.rotate3d.value[2]+ ', ' + transform.rotate3d.value[4] + transform.rotate3d.unit + ')';
 				
 				return style
 			}

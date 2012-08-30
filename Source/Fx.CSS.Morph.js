@@ -82,8 +82,9 @@ Fx.Morph.implement(Object.append({
 			if(this.keys.length == 0) return this.stop();
 			
 			element.addEvent('transitionend', this.transitionend).
-			setStyle(transition, this.keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join()).
-			setStyles(styles);
+			setStyle(transition, this.keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join());
+			
+			element.setStyles(styles);
 			
 			return this
 		}

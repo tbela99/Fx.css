@@ -3,7 +3,7 @@
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>Fx.CSS Tween using css transitions</title>
+<title>Fx.CSS Morph</title>
 <style type="text/css">
 html {
 
@@ -57,10 +57,33 @@ body {
 				}}).addEvent('click', function () {
 
 					this.get('tween').cancel().
-					start('border-color', '#DE3434').
-					start('border-color', '#2F4C74').
-					start('border-color', '#000', '#F5F41E').
-					start('border-color', '#000', '#fff');
+					start('opacity', .1).chain(function () {
+					
+						console.log('.1')
+						this.callChain()
+					}).
+					start('opacity', .1).chain(function () {
+					
+						console.log('.1 again!')
+						this.callChain()
+					}).
+					start('opacity', .5).chain(function () {
+					
+						console.log('.5')
+						this.callChain()
+					}).
+					start('opacity', .5).chain(function () {
+					
+						console.log('.5 again!')
+						this.callChain()
+					}).
+					start('opacity', .5, .1).
+					start('opacity', 1, 0).
+					start('opacity', 0, 1).
+					start('opacity', 1).chain(function () {
+					
+						console.log('completed!')
+					});
 				})
 			})
 	})

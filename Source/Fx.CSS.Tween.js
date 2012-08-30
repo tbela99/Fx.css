@@ -55,8 +55,8 @@ Fx.Tween.implement(Object.append({
 			if(args[1] != undefined) element.setStyle(property, from);
 
 			element.setStyle('transition', this.keys.map(function (prop) { return element.getPrefixed(prop).hyphenate() + css }).join()).
-						addEvent('transitionend', this.transitionend).
-						setStyle(property, to);
+							addEvent('transitionend', this.transitionend).
+							setStyle(property, to);
 
 			if(from == to || ['', 'transparent', 'auto', 'none'].indexOf(from) != -1) this.stop();
 
