@@ -1,9 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<!DOCTYPE HTML>
+<html><head>
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>Fx.CSS Elements</title>
+<title>Fx.CSS Elements tween 3D</title>
 <style type="text/css">
 html {
 
@@ -26,6 +26,7 @@ body {
 	vertical-align: middle;
 	text-align: center;
 	font-size: 150%;
+	transition-delay: 1s;
 }
 
 .circle {
@@ -36,9 +37,10 @@ body {
 }
 </style>
 <script type="text/javascript" src="../mootools.js"></script>
+<script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.Elements.js"></script>
 
 <script type="text/javascript">
 //<![CDATA[
@@ -48,12 +50,11 @@ body {
 		var value,
 			events = {transform: ['translateX(100px) translateY(50px) translateZ(50px) rotateX(182deg) rotateY(182deg) rotateZ(182deg)', 'translateX(0) translateY(0) translateZ(0) rotateX(0) rotateY(0) rotateZ(0)']},
 				
-			elements = document.getElements('.square, .circle').addEvent('click', function () {
+			elements = document.getElements('.square,.circle').addEvent('click', function () {
 
-				fx.cancel()
-				.start({0: events, 1: events})//.start({0: events[0], 1: events[0]}).start({0: events[4], 1: events[6]}).start({0: events[5], 1: events[5]})
+				fx.cancel().start({0: events, 1: events})//.start({0: events[0], 1: events[0]}).start({0: events[4], 1: events[6]}).start({0: events[5], 1: events[5]})
 			}),
-			fx = new Fx.Elements(elements, {link: 'chain', duration: 1000})	
+			fx = new Fx.Elements(elements, {link: 'chain', duration: 1000, onComplete: function () { console.log('completed!') }})	
 	})
 //]]></script>
 </head><body>

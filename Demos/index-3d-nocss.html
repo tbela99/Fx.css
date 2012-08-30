@@ -3,15 +3,13 @@
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>Fx.CSS Morph</title>
+<title>Fx.CSS Elements tween 3D</title>
 <style type="text/css">
 html {
 
 	font-family:Arial, Helvetica, sans-serif;
 	color: #333;
 	font-size:1.2em;
-	background: #000;
-	color: #fff;
 }
 body {
 
@@ -28,7 +26,6 @@ body {
 	vertical-align: middle;
 	text-align: center;
 	font-size: 150%;
-	border: 1px solid #fff;
 }
 
 .circle {
@@ -41,7 +38,6 @@ body {
 <script type="text/javascript" src="../mootools.js"></script>
 <script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -49,21 +45,14 @@ body {
 
 	window.addEvent('domready', function () {
 
-			document.getElements('.square, .circle').each(function (el) {
-			
-				el.set('tween', {duration: 1000, link: 'chain', onComplete: function() {
+		var value,
+			events = {transform: ['translateX(100px) translateY(50px) translateZ(50px) rotateX(182deg) rotateY(182deg) rotateZ(182deg)', 'translateX(0) translateY(0) translateZ(0) rotateX(0) rotateY(0) rotateZ(0)']},
 				
-					if(window.console && console.log) console.log(el)
-				}}).addEvent('click', function () {
+			elements = document.getElements('.square,.circle').addEvent('click', function () {
 
-					this.get('tween').cancel().
-					start('opacity', .1).
-					start('opacity', .5).
-					start('opacity', .5, .1).
-					start('opacity', 1, 0).
-					start('opacity', 1);
-				})
-			})
+				fx.cancel().start({0: events, 1: events})//.start({0: events[0], 1: events[0]}).start({0: events[4], 1: events[6]}).start({0: events[5], 1: events[5]})
+			}),
+			fx = new Fx.Elements(elements, {link: 'chain', duration: 1000, onComplete: function () { console.log('completed!') }})	
 	})
 //]]></script>
 </head><body>

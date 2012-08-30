@@ -10,6 +10,8 @@ html {
 	font-family:Arial, Helvetica, sans-serif;
 	color: #333;
 	font-size:1.2em;
+	background: #000;
+	color: #fff;
 }
 body {
 
@@ -26,6 +28,7 @@ body {
 	vertical-align: middle;
 	text-align: center;
 	font-size: 150%;
+	border: 1px solid #fff;
 }
 
 .circle {
@@ -38,7 +41,7 @@ body {
 <script type="text/javascript" src="../mootools.js"></script>
 <script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Morph.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -46,32 +49,41 @@ body {
 
 	window.addEvent('domready', function () {
 
-		var value,
-			events = [{transform: ['rotate(0deg) scale(1, 0) skewX(0) skewY( 3deg) translate(100px, 50px)', 'rotate(180deg) scale(1.5, 4) skewX(0) skewY( 3deg) translate(20px, 3px)']},
-					{transform: 'rotate(90deg) scale(1, 1) skewX(0) skewY(0) translate(0, 0)'},
-					{transform: 'rotate(-90deg)'},
-					{transform: 'rotate(0)'},
-					{color: '#fff', backgroundColor: '#000', borderColor: '#245884'},
-					{height: 250, width: 300, transform: 'rotate(157deg)'},
-					{height: 100, width: 100, transform: 'rotate(0)'},
-					{height: 300, width: 250, transform: 'rotate(20deg)'},
-					{color: '#000', backgroundColor: '#fff', borderColor: '#000'}
-				];
-				
 			document.getElements('.square, .circle').each(function (el) {
 			
-				el.set('morph', {duration: 1000, link: 'chain'}).addEvent('click', function () {
+				el.set('tween', {duration: 1000, link: 'chain', onComplete: function() {
+				
+					if(window.console && console.log) console.log(el)
+				}}).addEvent('click', function () {
 
-					this.get('morph').cancel()
-					.start(events[6])
-					.start(events[0])
-					.start(events[1])
-					.start(events[4])
-					.start(events[5])
-					.start(events[3])
-					.start(events[7])
-					.start(events[6])
-					.start(events[8]);
+					this.get('tween').cancel().
+					start('opacity', .1).chain(function () {
+					
+						console.log('.1')
+						this.callChain()
+					}).
+					start('opacity', .1).chain(function () {
+					
+						console.log('.1 again!')
+						this.callChain()
+					}).
+					start('opacity', .5).chain(function () {
+					
+						console.log('.5')
+						this.callChain()
+					}).
+					start('opacity', .5).chain(function () {
+					
+						console.log('.5 again!')
+						this.callChain()
+					}).
+					start('opacity', .5, .1).
+					start('opacity', 1, 0).
+					start('opacity', 0, 1).
+					start('opacity', 1).chain(function () {
+					
+						console.log('completed!')
+					});
 				})
 			})
 	})

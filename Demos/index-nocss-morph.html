@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<!DOCTYPE HTML>
+<html><head>
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -36,7 +36,7 @@ body {
 }
 </style>
 <script type="text/javascript" src="../mootools.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.js"></script>
+<script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -45,8 +45,8 @@ body {
 	window.addEvent('domready', function () {
 
 		var value,
-			events = [{transform: ['rotate(0deg) scale(1, 0) skew(0, 3deg) translate(100px, 50px)', 'rotate(180deg) scale(1.5, 4) skew(0, 3deg) translate(20px, 3px)']},
-					{transform: 'rotate(90deg) scale(1, 1) skew(0,0) translate(0, 0)'},
+			events = [{transform: ['rotate(0deg) scale(1, 0) skewX(0) skewY( 3deg) translate(100px, 50px)', 'rotate(180deg) scale(1.5, 4) skewX(0) skewY( 3deg) translate(20px, 3px)']},
+					{transform: 'rotate(90deg) scale(1, 1) skewX(0) skewY(0) translate(0, 0)'},
 					{transform: 'rotate(-90deg)'},
 					{transform: 'rotate(0)'},
 					{color: '#fff', backgroundColor: '#000', borderColor: '#245884'},

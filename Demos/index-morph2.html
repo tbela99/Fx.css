@@ -3,7 +3,7 @@
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>Fx.CSS Tween</title>
+<title>Fx.CSS Morph</title>
 <style type="text/css">
 html {
 
@@ -19,9 +19,6 @@ body {
 .square, .circle {
 
 	height: 100px;
-	/* -moz-transform: rotate(0);
-	-webkit-transform: rotate(0);
-	transform: rotate(0); */
 	width:100px;
 	margin: 0 auto;
 	cursor: pointer;
@@ -41,7 +38,7 @@ body {
 <script type="text/javascript" src="../mootools.js"></script>
 <script type="text/javascript" src="../Source/Element.getPrefixed.js"></script>
 <script type="text/javascript" src="../Source/Fx.CSS.js"></script>
-<script type="text/javascript" src="../Source/Fx.CSS.Tween.js"></script>
+<script type="text/javascript" src="../Source/Fx.CSS.Morph.js"></script>
 <script type="text/javascript" src="../Source/Fx.Parsers.Transform.js"></script>
 
 <script type="text/javascript">
@@ -61,21 +58,15 @@ body {
 					{color: '#000', backgroundColor: '#fff', borderColor: '#000'}
 				];
 				
-		document.getElements('.square, .circle').each(function (el) {
+			document.getElements('.square, .circle').each(function (el) {
 			
-			el.set('tween', {duration: 1000, link: 'chain'/*, onComplete: function () { console.log('tween completed?') } */ }).addEvent('click', function () {
+				el.set('morph', {duration: 1000, link: 'chain', onComplete: function () { console.log('completed!') }}).addEvent('click', function () {
 
-				//console.log(this.get('tween').cancel());
-				this.get('tween').cancel().//.start('transform', events[0].transform[0], events[0].transform[1]).start('transform', events[1].transform)
-				start('transform', 'rotate(0)', events[2].transform).
-				start('transform', events[3].transform).
-				start('height', 250).
-				start('height', 100).
-				start('transform', events[0].transform[0], events[0].transform[1]).
-				start('transform', events[0].transform[0]).
-				start('transform', 'rotate(0deg) scale(1, 1) skewX(0) skewY( 0) translate(0, 0)');
+					this.get('morph').cancel()
+					.start({opacity: .5, marginTop: 50})
+					.start({opacity: 1, marginTop: 0});
+				})
 			})
-		})
 	})
 //]]></script>
 </head><body>
