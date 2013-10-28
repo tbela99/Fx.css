@@ -30,7 +30,7 @@ provides: [FxCSS]
 
 	var div = new Element('div'),
 		transition,
-		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'ms' : '')),
+		prefix = Browser.safari || Browser.chrome || Browser.Platform.ios ? 'webkit' : (Browser.opera ? 'o' : (Browser.ie ? 'MS' : '')),
 		prefixes = ['Khtml','O','Ms','Moz','Webkit'],
 		cache = {};
 			
